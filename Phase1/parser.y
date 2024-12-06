@@ -31,7 +31,6 @@
 %token <string> CHARARRAY
 %token STRING
 %token <string> VARIABLE
-%token <string> FUNCTION_NAME
 %token CONST REPEAT UNTIL FOR SWITCH CASE IF THEN ELSE RETURN WHILE FUNCTION VOID GE LE EQ NE
 // %type <floating> expression caseExpression
 
@@ -74,7 +73,7 @@ assignmentValue:
     expression  { printf("expression\n"); }
     | CHARACTER
     | CHARARRAY
-    | FUNCTION_NAME '(' parameters ')'
+    | VARIABLE '(' parameters ')'
     ;
 
 initialization:
@@ -83,38 +82,25 @@ initialization:
     ;
 
 expression:
-    mathematical    { printf("mathematical\n"); }
-    | logical
-    | VARIABLE
-    ;
-
-mathematical:
-    mathematical '+' mathematical
-    | mathematical '-' mathematical
-    | mathematical '*' mathematical
-    | mathematical '/' mathematical
-    | mathematical '^' mathematical
-    | '-' mathematical
-    | '(' mathematical ')'
-    | numerical { printf("numerical\n"); }
-    ;
-
-numerical:
-    INTEGER { printf("integer\n"); }
+    VARIABLE
+    | INTEGER
     | FLOATING
-    ;
-
-logical:
-    mathematical '>' mathematical
-    | mathematical '<' mathematical
-    | mathematical GE mathematical
-    | mathematical LE mathematical
-    | mathematical EQ mathematical
-    | mathematical NE mathematical
-    | logical '|' logical
-    | logical '&' logical
-    | '(' logical ')'
     | BOOLEAN
+    | expression '+' expression
+    | expression '-' expression
+    | expression '*' expression
+    | expression '/' expression
+    | expression '^' expression
+    | '-' expression
+    | expression '|' expression
+    | expression '&' expression
+    | expression '<' expression
+    | expression '>' expression
+    | expression GE expression
+    | expression LE expression
+    | expression EQ expression
+    | expression NE expression
+    | '(' expression ')'
     ;
 
 
@@ -127,9 +113,9 @@ statement:
     | scope { printf("scope\n");}
     | IF '(' expression ')' THEN scope { printf("if\n");}
     | IF '(' expression ')' THEN scope ELSE scope { printf("if else\n");}
-    | FUNCTION dataType FUNCTION_NAME '(' arguments ')' scope { printf("function\n");}
-    | FUNCTION VOID FUNCTION_NAME '(' arguments ')' scope { printf("function\n");}
-    | FUNCTION_NAME '(' parameters ')' { printf("function call\n"); }
+    | FUNCTION dataType VARIABLE '(' arguments ')' scope { printf("function\n");}
+    | FUNCTION VOID VARIABLE '(' arguments ')' scope { printf("function\n");}
+    | VARIABLE '(' parameters ')' { printf("function call\n"); }
     | RETURN assignmentValue { printf("return\n");}
     | RETURN { printf("return\n");}
     ;
@@ -165,8 +151,7 @@ caseCondition:
     ;
 
 caseExpression:
-    mathematical
-    | logical
+    expression
     ;
 
 %%

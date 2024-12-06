@@ -50,24 +50,23 @@
      CHARARRAY = 266,
      STRING = 267,
      VARIABLE = 268,
-     FUNCTION_NAME = 269,
-     CONST = 270,
-     REPEAT = 271,
-     UNTIL = 272,
-     FOR = 273,
-     SWITCH = 274,
-     CASE = 275,
-     IF = 276,
-     THEN = 277,
-     ELSE = 278,
-     RETURN = 279,
-     WHILE = 280,
-     FUNCTION = 281,
-     VOID = 282,
-     GE = 283,
-     LE = 284,
-     EQ = 285,
-     NE = 286
+     CONST = 269,
+     REPEAT = 270,
+     UNTIL = 271,
+     FOR = 272,
+     SWITCH = 273,
+     CASE = 274,
+     IF = 275,
+     THEN = 276,
+     ELSE = 277,
+     RETURN = 278,
+     WHILE = 279,
+     FUNCTION = 280,
+     VOID = 281,
+     GE = 282,
+     LE = 283,
+     EQ = 284,
+     NE = 285
    };
 #endif
 /* Tokens.  */
@@ -82,24 +81,23 @@
 #define CHARARRAY 266
 #define STRING 267
 #define VARIABLE 268
-#define FUNCTION_NAME 269
-#define CONST 270
-#define REPEAT 271
-#define UNTIL 272
-#define FOR 273
-#define SWITCH 274
-#define CASE 275
-#define IF 276
-#define THEN 277
-#define ELSE 278
-#define RETURN 279
-#define WHILE 280
-#define FUNCTION 281
-#define VOID 282
-#define GE 283
-#define LE 284
-#define EQ 285
-#define NE 286
+#define CONST 269
+#define REPEAT 270
+#define UNTIL 271
+#define FOR 272
+#define SWITCH 273
+#define CASE 274
+#define IF 275
+#define THEN 276
+#define ELSE 277
+#define RETURN 278
+#define WHILE 279
+#define FUNCTION 280
+#define VOID 281
+#define GE 282
+#define LE 283
+#define EQ 284
+#define NE 285
 
 
 
@@ -120,7 +118,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 124 "y.tab.h"
+#line 122 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
