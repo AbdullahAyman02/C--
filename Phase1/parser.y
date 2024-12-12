@@ -120,19 +120,14 @@ expression:
     | '(' expression ')'
     ;
 
-argumentsList:
-    dataType VARIABLE
-    | dataType VARIABLE ',' argumentsList
-    ;
-
 arguments:
     argumentsList
     | /* NULL */
     ;
 
-parametersList:
-    assignmentValue ',' parametersList
-    | assignmentValue
+argumentsList:
+    dataType VARIABLE
+    | dataType VARIABLE ',' argumentsList
     ;
 
 parameters:
@@ -140,6 +135,11 @@ parameters:
     | /* NULL */
     ;
 
+parametersList:
+    assignmentValue ',' parametersList
+    | assignmentValue
+    ;
+    
 case:
     CASE caseCondition ':' scope
     | CASE caseCondition ':' scope case
