@@ -139,7 +139,7 @@ parametersList:
     assignmentValue ',' parametersList
     | assignmentValue
     ;
-    
+
 case:
     CASE caseCondition ':' scope
     | CASE caseCondition ':' scope case
@@ -147,11 +147,7 @@ case:
 
 caseCondition:
     CHAR
-    | caseExpression
-    ;
-
-caseExpression:
-    expression
+    | INTEGER
     ;
 
 %%
