@@ -1,5 +1,5 @@
 %{
-    #include "y.tab.h"
+    #include "parser.tab.h"
     #include <stdio.h>      // for functions like printf and scanf
     #include <string.h>     // for functions like strcmp
     void yyerror(char *);   // for error handling. This function is called when an error occurs
@@ -38,7 +38,7 @@
                           return BOOLEAN;
                         }
 
-[-+/*(){}.=;&|><?:,]   {
+[-+/*(){}.=;&|><?:,]    {
                           yylval.string = strdup(yytext);
                           printf("Token: %s\n", yytext);
                           return *yytext;
@@ -48,18 +48,22 @@
                           printf("Token: WHILE\n");
                           return WHILE;
                         }
+
 "repeat"                {
                           printf("Token: REPEAT\n");
                           return REPEAT;
                         }
+
 "until"                 {
                           printf("Token: UNTIL\n");
                           return UNTIL;
                         }
+
 "for"                   {
                           printf("Token: FOR\n");
                           return FOR;
                         }
+
 "switch"                {
                           printf("Token: SWITCH\n");
                           return SWITCH;
@@ -68,66 +72,82 @@
                           printf("Token: CASE\n");
                           return CASE;
                         }
+
 "if"                    {
                           printf("Token: IF\n");
                           return IF;
                         }
+
 "then"                  {
                           printf("Token: THEN\n");
                           return THEN;
                         }
+
 "else"                  {
                           printf("Token: ELSE\n");
                           return ELSE;
                         }
+
 "function"              {
                           printf("Token: FUNCTION\n");
                           return FUNCTION;
                         }
+
 "return"                {
                           printf("Token: RETURN\n");
                           return RETURN;
                         }
+
 "int"                   {
                           printf("Token: INT\n");
                           return INT;
                         }
+
 "float"                 {
                           printf("Token: FLOAT\n");
                           return FLOAT;
                         }
+
 "bool"                  {
                           printf("Token: BOOL\n");
                           return BOOL;
                         }
+
 "char"                  {
                           printf("Token: CHAR\n");
                           return CHAR;
                         }
+
 "string"                {
                           printf("Token: STRING\n");
                           return STRING;
                         }
+
 "const"                 {
                           printf("Token: CONST\n");
                           return CONST;
                         }
+
 "void"                  {
                           printf("Token: VOID\n");
                           return VOID;
                         }
+
 ">="                    {
                           printf("Token: GE\n");
                           return GE;
                         }
+
 "<="                    {
                           printf("Token: LE\n");
                           return LE;
                         }
+
 "=="                    {
                           printf("Token: EQ\n");
                           return EQ;
                         }
+
 "!="                    {
                           printf("Token: NE\n");
                           return NE;
@@ -141,6 +161,7 @@
                         }
 
 [ \t\n]+                ; /* Ignore whitespace */
+
 \/\/.*                  ; /* Ignore comments */
 
 .                       ; yyerror("Invalid character for some reason");
