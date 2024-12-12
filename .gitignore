@@ -1,0 +1,8 @@
+#Ignore *.yy.c, *.tab.c, *.tab.h, parser.exe, parser *.output
+
+*.yy.c
+*.tab.c
+*.tab.h
+parser.exe
+parser
+*.output
