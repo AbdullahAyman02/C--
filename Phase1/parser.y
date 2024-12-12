@@ -4,6 +4,7 @@
     int yylex(void);        // for lexical analysis. This function is called to get the next token
     extern FILE *yyin;      // for file handling. This is the input file. The default is stdin
     extern int yylineno;    // for line number. This variable stores the current line number
+    extern char *yytext;    // for token text. This variable stores the current token text
     #define YYDEBUG 1       // for debugging. If set to 1, the parser will print the debugging information
     extern int yydebug;     // for debugging. This variable stores the current debugging level
 %}
@@ -46,23 +47,44 @@
 // The grammar rules are defined here. The grammar rules define the structure of the language. They define how the tokens are combined to form statements, expressions, etc.
 
 program:
-    statement ';' program { printf("statement\n"); }
+    statement ';' program                       { printf("statement\n"); }
     | /* NULL */
     | ';' program
+    ;
+
+statement:
+    initialization                                                      { printf("initialization\n");}
+    | WHILE '(' expression ')' scope                                    { printf("while\n");}
+    | REPEAT scope UNTIL '(' expression ')'                             { printf("repeat\n");}
+    | FOR '(' initialization ';' expression ';' assignment ')' scope    { printf("for\n");}
+    | SWITCH '(' expression ')' '{' case '}'                            { printf("switch\n");}
+    | scope                                                             { printf("scope\n");}
+    | IF '(' expression ')' THEN scope                                  { printf("if\n");}
+    | IF '(' expression ')' THEN scope ELSE scope                       { printf("if else\n");}
+    | FUNCTION dataType VARIABLE '(' arguments ')' scope                { printf("function\n");}
+    | FUNCTION VOID VARIABLE '(' arguments ')' scope                    { printf("function\n");}
+    | VARIABLE '(' parameters ')'                                       { printf("function call\n"); }
+    | RETURN assignmentValue                                            { printf("return\n");}
+    | RETURN                                                            { printf("return\n");}
+    ;
+
+initialization:
+    declaration                                 { printf("declaration\n"); }
+    | assignment
     ;
 
 scope:
     '{' program '}'
     ;
 
-dataType:
-    INT | FLOAT | CHAR | STRING | BOOL
-    ;
-
 declaration:
     dataType VARIABLE
-    | dataType VARIABLE '=' assignmentValue { printf("dataType VARIALE = assignmentValue\n"); }
+    | dataType VARIABLE '=' assignmentValue     { printf("dataType VARIALE = assignmentValue\n"); }
     | CONST dataType VARIABLE '=' assignmentValue
+    ;
+
+dataType:
+    INT | FLOAT | CHAR | STRING | BOOL          { printf("dataType\n"); }
     ;
 
 assignment:
@@ -70,15 +92,10 @@ assignment:
     ;
 
 assignmentValue:
-    expression  { printf("expression\n"); }
+    expression                                  { printf("expression\n"); }
     | CHARACTER
     | CHARARRAY
     | VARIABLE '(' parameters ')'
-    ;
-
-initialization:
-    declaration { printf("declaration\n"); }
-    | assignment
     ;
 
 expression:
@@ -101,23 +118,6 @@ expression:
     | expression EQ expression
     | expression NE expression
     | '(' expression ')'
-    ;
-
-
-statement:
-    initialization  { printf("initialization\n");}
-    | WHILE '(' expression ')' scope { printf("while\n");}
-    | REPEAT scope UNTIL '(' expression ')' { printf("repeat\n");}
-    | FOR '(' initialization ';' expression ';' assignment ')' scope { printf("for\n");}
-    | SWITCH '(' expression ')' '{' case '}' { printf("switch\n");}
-    | scope { printf("scope\n");}
-    | IF '(' expression ')' THEN scope { printf("if\n");}
-    | IF '(' expression ')' THEN scope ELSE scope { printf("if else\n");}
-    | FUNCTION dataType VARIABLE '(' arguments ')' scope { printf("function\n");}
-    | FUNCTION VOID VARIABLE '(' arguments ')' scope { printf("function\n");}
-    | VARIABLE '(' parameters ')' { printf("function call\n"); }
-    | RETURN assignmentValue { printf("return\n");}
-    | RETURN { printf("return\n");}
     ;
 
 argumentsList:
@@ -157,22 +157,29 @@ caseExpression:
 %%
 
 void yyerror(char *s) {
-    extern int yylineno; // Line number from lexer
-    extern char *yytext; // Current token text from lexer
     fprintf(stderr, "Error: %s at line %d, near '%s'\n", s, yylineno, yytext);
 }
 
-int main() {
+// pass argument in command line
+// example: ./parser.exe input.txt
+int main(int argc, char **argv) {
     yydebug = 0;
+
+    if(argc != 2) {
+        printf("Usage: %s <input file>\n", argv[0]);
+        return 1;
+    }
+
     // Open the input file
-    yyin = fopen("input.txt", "r");
-    // Print the first line of the input file
-    // char line[256];
-    // if (fgets(line, sizeof(line), yyin)) {
-    //     printf("%s", line);
-    // }
+    yyin = fopen(argv[1], "r");
+    if(yyin == NULL) {
+        printf("Error: Unable to open file %s\n", argv[1]);
+        return 1;
+    }
+    
     // Call the parser
     yyparse();
+    
     // Close the input file
     fclose(yyin);
     return 0;
