@@ -10,7 +10,7 @@ endif
 all: clean flex bison gcc
 
 clean:
-	rm -f *.yy.c *.tab.c *.tab.h *.output parser${extension}
+	rm -f *.yy.c *.tab.c *.tab.h *.output *.o parser${extension}
 
 flex:
 	flex lexer.l
@@ -19,4 +19,7 @@ bison:
 	bison -d -v parser.y
 
 gcc:
-	gcc ${MACRO} lex.yy.c parser.tab.c -o parser${extension}
+	gcc -c ${MACRO} lex.yy.c 
+	gcc -c ${MACRO} parser.tab.c
+	g++ -c ${MACRO} example.cpp 
+	g++ ${MACRO} lex.yy.o parser.tab.o example.o -o parser${extension}

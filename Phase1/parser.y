@@ -7,6 +7,7 @@
     extern char *yytext;    // for token text. This variable stores the current token text
     #define YYDEBUG 1       // for debugging. If set to 1, the parser will print the debugging information
     extern int yydebug;     // for debugging. This variable stores the current debugging level
+    #include "example.h"
 %}
 
 // The union is used to define the types of the tokens. Since the datatypes that we will work with are  either int/float, char/string, and boolean, we will use a union to define the types of the tokens   
@@ -178,5 +179,6 @@ int main(int argc, char **argv) {
     
     // Close the input file
     fclose(yyin);
+    my_function_c();
     return 0;
 }
