@@ -63,7 +63,7 @@ statement:
     | IF '(' expression ')' THEN scope ELSE scope                       { printf("if else\n");}
     | FUNCTION dataType VARIABLE '(' arguments ')' scope                { printf("function\n");}
     | FUNCTION VOID VARIABLE '(' arguments ')' scope                    { printf("function\n");}
-    | VARIABLE '(' parameters ')'                                       { printf("function call\n"); }
+    | functionCall                                                      { printf("function call\n"); }
     | RETURN assignmentValue                                            { printf("return\n");}
     | RETURN                                                            { printf("return\n");}
     ;
@@ -95,7 +95,11 @@ assignmentValue:
     expression                                  { printf("expression\n"); }
     | CHARACTER
     | CHARARRAY
-    | VARIABLE '(' parameters ')'
+    | functionCall
+    ;
+
+functionCall:
+    VARIABLE '(' parameters ')'
     ;
 
 expression:

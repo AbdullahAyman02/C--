@@ -1,0 +1,13 @@
+// To compile and run
+// Run in the terminal the following commands:
+// flex lexer.l
+// bison --yacc -d parser.y
+// gcc .\lex.yy.c .\y.tab.c -o parser
+// .\parser.exe
+
+{
+
+int y = 2;
+float z = 3;
+
+};
