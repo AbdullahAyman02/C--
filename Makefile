@@ -1,11 +1,7 @@
 all: clean flex bison gcc
 
 clean:
-ifeq ($(OS),Windows_NT)
-	del /F /Q *.yy.c *.tab.c *.tab.h *.output *.o parser.exe 2>nul || true
-else
-	rm -f *.yy.c *.tab.c *.tab.h *.output parser *.o
-endif
+	del /F /Q *.yy.c *.tab.c *.tab.h *.output *.o parser.exe 2>nul || rm -f *.yy.c *.tab.c *.tab.h *.output parser *.o
 
 flex:
 	flex lexer.l
@@ -16,4 +12,5 @@ bison:
 gcc:
 	gcc -c y.tab.c
 	gcc -c lex.yy.c
-	g++ -std=c++11 -o parser y.tab.o lex.yy.o Quadruples.cpp SymbolTable.cpp
+	gcc -c common.c
+	g++ -std=c++11 -o parser y.tab.o lex.yy.o common.o Quadruples.cpp SymbolTable.cpp

@@ -1,9 +1,11 @@
 %{
+    #include "common.h"
     #include "y.tab.h"
     #include <stdio.h>      // for functions like printf and scanf
     #include <string.h>     // for functions like strcmp
     void yyerror(char *);   // for error handling. This function is called when an error occurs
     // int count = 1;
+    
 %}
 %option yylineno
 %%
@@ -38,11 +40,13 @@
                           return BOOLEAN;
                         }
 
-[-+/*(){}.=;&|><?:,]    {
-                          yylval.string = strdup(yytext);
-                          printf("Token: %s\n", yytext);
-                          return *yytext;
-                        }
+([-+/*(){}.=;><?:,]|&&|\|\|)   {
+                                yylval.string = strdup(yytext);
+                                printf("Token: %s\n", yytext);
+                                return *yytext;
+                               }
+                      
+
 
 "while"                 {
                           printf("Token: WHILE\n");
@@ -156,7 +160,7 @@
 [a-zA-Z_][a-zA-Z0-9_]*  {
                         //   yylval.sIndex = count++;
                           printf("Token: VARIABLE, Value: %s\n", yytext);
-                          yylval.string = yytext;
+                          yylval.string = strdup(yytext);
                           return VARIABLE;
                         }
 

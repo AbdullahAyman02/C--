@@ -5,9 +5,10 @@
 // gcc .\lex.yy.c .\y.tab.c -o parser
 // .\parser.exe
 
-{
-
-int y = 2;
-float z = 3;
-
+function int test_function() {
+    flag = True;
+    //ret 3;
+    return 3;
 };
+
+bool x = (3<test_function());

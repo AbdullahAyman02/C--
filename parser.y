@@ -1,6 +1,6 @@
 %{
-    #include <stdio.h>      // for functions like printf and scanf
     #include "common.h"
+    #include <stdio.h>      // for functions like printf and scanf
     void yyerror(char *);   // for error handling. This function is called when an error occurs
     int yylex(void);        // for lexical analysis. This function is called to get the next token
     extern FILE *yyin;      // for file handling. This is the input file. The default is stdin
@@ -8,6 +8,7 @@
     extern char *yytext;    // for token text. This variable stores the current token text
     #define YYDEBUG 1       // for debugging. If set to 1, the parser will print the debugging information
     extern int yydebug;     // for debugging. This variable stores the current debugging level
+
 %}
 
 // The union is used to define the types of the tokens. Since the datatypes that we will work with are  either int/float, char/string, and boolean, we will use a union to define the types of the tokens   
@@ -16,6 +17,8 @@
     float floating;         // floating value
     char character;         // character value
     char* string;           // string value
+    Type type;      // data type
+    void* list;        // list of parameters
     // bool boolean;           // boolean value
 };
 
@@ -37,12 +40,15 @@
 // %type <floating> expression caseExpression
 
 %nonassoc '='       // non-associative token. This means that the token cannot be used in a chain of tokens like a=b=c, but can be used in a=b
-%left '|'           // left associative token. This means that the token is evaluated from left to right a | b | c -> (a | b) | c
-%left '&'
+%left '||'           // left associative token. This means that the token is evaluated from left to right a | b | c -> (a | b) | c
+%left '&&'
 %left '<' '>' GE LE EQ NE
 %left '+' '-'
 %left '*' '/'
 %right '^'          // right associative token. This means that the token is evaluated from right to left a ^ b ^ c -> a ^ (b ^ c)
+
+%type <type> dataType expression assignmentValue functionCall
+%type <list> arguments argumentsList parameters parametersList
 
 %%
 // The grammar rules are defined here. The grammar rules define the structure of the language. They define how the tokens are combined to form statements, expressions, etc.
@@ -62,8 +68,16 @@ statement:
     | scope                                                             { printf("scope\n");}
     | IF '(' expression ')' THEN scope                                  { printf("if\n");}
     | IF '(' expression ')' THEN scope ELSE scope                       { printf("if else\n");}
-    | FUNCTION dataType VARIABLE '(' arguments ')' scope                { printf("function\n");}
-    | FUNCTION VOID VARIABLE '(' arguments ')' scope                    { printf("function\n");}
+    | FUNCTION dataType VARIABLE '(' arguments ')' scope                { 
+                                                                            void* parametersList = $5;
+                                                                            void* function = createFunction($2,$3,parametersList,yylineno);
+                                                                            addSymbolToSymbolTable(function);
+                                                                        }
+    | FUNCTION VOID VARIABLE '(' arguments ')' scope                    { 
+                                                                            void* parametersList = $5;
+                                                                            void* function = createFunction(VOID_T,$3,parametersList,yylineno);
+                                                                            addSymbolToSymbolTable(function);
+                                                                        }
     | functionCall                                                      { printf("function call\n"); }
     | RETURN assignmentValue                                            { printf("return\n");}
     | RETURN                                                            { printf("return\n");}
@@ -79,13 +93,32 @@ scope:
     ;
 
 declaration:
-    dataType VARIABLE
-    | dataType VARIABLE '=' assignmentValue     { printf("dataType VARIALE = assignmentValue\n"); }
-    | CONST dataType VARIABLE '=' assignmentValue
+    dataType VARIABLE                           {      
+                                                        void* variable = createVariable($1,$2, yylineno,0);
+                                                        addSymbolToSymbolTable(variable);
+                                                }
+    | dataType VARIABLE '=' assignmentValue     { 
+                                                        void* variable = createVariable($1,$2, yylineno,0);
+                                                        Type assignmentType = $4;
+                                                        Type variableType = $1;
+                                                        checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
+                                                        addSymbolToSymbolTable(variable);
+                                                }
+    | CONST dataType VARIABLE '=' assignmentValue { 
+                                                        void* variable = createVariable($2,$3, yylineno,1);
+                                                        Type assignmentType = $5;
+                                                        Type variableType = $2;
+                                                        checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
+                                                        addSymbolToSymbolTable(variable);
+                                                  }
     ;
 
 dataType:
-    INT | FLOAT | CHAR | STRING | BOOL          { printf("dataType\n"); }
+    INT               {$$ = INTEGER_T;} 
+    | FLOAT           {$$ = FLOAT_T;}
+    | CHAR            {$$ = CHAR_T;}
+    | STRING          {$$ = STRING_T;}
+    | BOOL            {$$ = BOOLEAN_T;}
     ;
 
 assignment:
@@ -93,56 +126,123 @@ assignment:
     ;
 
 assignmentValue:
-    expression                                  { printf("expression\n"); }
-    | CHARACTER
-    | CHARARRAY
-    | functionCall
+    expression                                  { $$ = $1; }
+    | CHARACTER                                 { $$ = CHAR_T; }
+    | CHARARRAY                                 { $$ = STRING_T; }
+    | functionCall                              { $$ = $1; }
     ;
 
 functionCall:
-    VARIABLE '(' parameters ')'
+    VARIABLE '(' parameters ')'     {
+                                        void* function = getSymbolFromSymbolTable($1,yylineno);
+                                        void* parametersList = $3;
+                                        checkParamListAgainstFunction(parametersList,function,yylineno);
+                                        $$ = getSymbolType(function);
+                                    }
     ;
 
 expression:
-    VARIABLE
-    | INTEGER
-    | FLOATING
-    | BOOLEAN
-    | expression '+' expression
-    | expression '-' expression
-    | expression '*' expression
-    | expression '/' expression
-    | expression '^' expression
-    | '-' expression
-    | expression '|' expression
-    | expression '&' expression
-    | expression '<' expression
-    | expression '>' expression
-    | expression GE expression
-    | expression LE expression
-    | expression EQ expression
-    | expression NE expression
-    | '(' expression ')'
+    VARIABLE                    { 
+                                    void* variable = getSymbolFromSymbolTable($1,yylineno);
+                                    $$ = getSymbolType(variable);
+                                }
+    | INTEGER                   { $$ = INTEGER_T; }
+    | FLOATING                  { $$ = FLOAT_T; }
+    | BOOLEAN                   { $$ = BOOLEAN_T; }
+    | expression '+' expression {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = $1;
+                                }
+    | expression '-' expression {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = $1;
+                                }
+    | expression '*' expression {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = $1;
+                                }
+    | expression '/' expression {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = $1;
+                                }
+    | expression '^' expression {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = $1;
+                                }
+    | '-' expression             {
+                                    checkParamIsNumber($2,yylineno);
+                                     $$ = $2;
+                                 }
+    | expression '||' expression {
+                                    checkBothParamsAreBoolean($1,$3,yylineno);
+                                    $$ = $1;
+                                 }
+    | expression '&&' expression {
+                                    checkBothParamsAreBoolean($1,$3,yylineno);
+                                    $$ = $1;
+                                 }
+    | expression '<' expression  {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = BOOLEAN_T;
+                                 }
+    | expression '>' expression {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = BOOLEAN_T;
+                                 }
+    | expression GE expression  {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = BOOLEAN_T;
+                                 }
+    | expression LE expression    {
+                                    checkBothParamsAreNumbers($1,$3,yylineno);
+                                    $$ = BOOLEAN_T;
+                                 }
+    | expression EQ expression  {
+                                    checkBothParamsAreOfSameType($1,$3,yylineno);
+                                    $$ = BOOLEAN_T;
+                                 }
+    | expression NE expression  {
+                                    checkBothParamsAreOfSameType($1,$3,yylineno);
+                                    $$ = BOOLEAN_T;
+                                 }
+    | '(' expression ')'        { $$ = $2; }
     ;
 
 arguments:
-    argumentsList
-    | /* NULL */
+    argumentsList  { $$ = $1; }
+    | /* NULL */   { $$ = createArgumentList(); }
     ;
 
 argumentsList:
-    dataType VARIABLE
-    | dataType VARIABLE ',' argumentsList
+    dataType VARIABLE                           {
+                                                    void* paramList = createArgumentList();
+                                                    void* variable = createVariable($1,$2, yylineno,0);
+                                                    addVariableToArgumentList(paramList,variable);
+                                                    $$ = paramList;
+                                                }
+    | dataType VARIABLE ',' argumentsList       {
+                                                    void* variable = createVariable($1,$2, yylineno,0);
+                                                    addVariableToArgumentList($4,variable);
+                                                    $$ = $4;
+                                                }
     ;
 
 parameters:
-    parametersList
-    | /* NULL */
+    parametersList     { $$ = $1; }
+    | /* NULL */        { $$ = createParamList(); }
     ;
 
 parametersList:
-    assignmentValue ',' parametersList
-    | assignmentValue
+    assignmentValue ',' parametersList      { void* paramList = $3; 
+                                                addTypeToParamList(paramList,$1);
+                                                $$ = paramList;
+                                            }
+
+    | assignmentValue                   { void* paramList = createParamList(); 
+                                            addTypeToParamList(paramList,$1);
+                                             $$ = paramList; 
+                                        }
+                                            
     ;
 
 case:
@@ -164,7 +264,6 @@ void yyerror(char *s) {
 // pass argument in command line
 // example: ./parser.exe input.txt
 int main(int argc, char **argv) {
-    hello();
     yydebug = 0;
 
     if(argc != 2) {
@@ -181,7 +280,7 @@ int main(int argc, char **argv) {
     
     // Call the parser
     yyparse();
-    
+    printSymbolTable();
     // Close the input file
     fclose(yyin);
     return 0;
