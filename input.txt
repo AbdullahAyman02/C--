@@ -36,5 +36,7 @@ function int test_function() {
 function void void_function(int a, char b, string c) {
     return;
 };
-
+for(int i = 0; i < i; i=i + 1) {
+    flag = False;
+};
 };

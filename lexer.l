@@ -162,9 +162,22 @@
 
 [ \t\n]+                ; /* Ignore whitespace */
 
-\/\/.*                  ; /* Ignore comments */
+\/\/.*                  ; /* Ignore single-line comments */
 
-.                       ; yyerror("Invalid character for some reason");
+\/\*[^*]*\*+([^/*][^*]*\*+)*\/ {
+                            /* Ignore multi-line comments */
+                          }
+
+\/\*[^*]*               {
+                            printf("Error: Unterminated comment starting at line %d\n", yylineno);
+                            yyerror("Unterminated comment");
+                          }
+
+.                       {
+                          char errorChar = yytext[0];
+                          printf("Error: Invalid character '%c' at line %d\n", errorChar, yylineno);
+                          yyerror("Invalid character");
+                        }
 
 %%
 
