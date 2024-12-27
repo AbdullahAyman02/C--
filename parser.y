@@ -1,5 +1,6 @@
 %{
     #include <stdio.h>      // for functions like printf and scanf
+    #include "common.h"
     void yyerror(char *);   // for error handling. This function is called when an error occurs
     int yylex(void);        // for lexical analysis. This function is called to get the next token
     extern FILE *yyin;      // for file handling. This is the input file. The default is stdin
@@ -163,6 +164,7 @@ void yyerror(char *s) {
 // pass argument in command line
 // example: ./parser.exe input.txt
 int main(int argc, char **argv) {
+    hello();
     yydebug = 0;
 
     if(argc != 2) {
