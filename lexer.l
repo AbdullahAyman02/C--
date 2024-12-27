@@ -1,5 +1,5 @@
 %{
-    #include "parser.tab.h"
+    #include "y.tab.h"
     #include <stdio.h>      // for functions like printf and scanf
     #include <string.h>     // for functions like strcmp
     void yyerror(char *);   // for error handling. This function is called when an error occurs
