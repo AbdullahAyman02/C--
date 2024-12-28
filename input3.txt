@@ -1,0 +1,30 @@
+// To compile and run
+// Run in the terminal the following commands:
+// flex lexer.l
+// bison --yacc -d parser.y
+// gcc .\lex.yy.c .\y.tab.c -o parser
+// .\parser.exe
+
+function void abc(int a, char b, string c) {
+    return;
+};
+
+function int xyz(int a, char b, string c) {
+    return;
+};
+
+{
+
+abc(1, 'a', "abc");
+
+{
+    function void wrz(int a, char b, string c) {
+        function void xyz1(int aa, char bb, string cc) {
+            a = xyz(1, 0, "abc");
+            return;
+        };
+     return;
+    };
+};
+
+};

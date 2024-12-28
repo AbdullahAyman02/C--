@@ -7,3 +7,5 @@ parser.exe
 parser
 *.output
 *.o
+
+.vscode/

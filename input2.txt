@@ -1,4 +1,4 @@
-int a = 7;
+const int a = 7;
 int c = 2 + (4 + 3) ^ 5;
 int d = a + c;
 c = -d;

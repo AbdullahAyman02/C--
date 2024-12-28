@@ -57,42 +57,69 @@
 // The grammar rules are defined here. The grammar rules define the structure of the language. They define how the tokens are combined to form statements, expressions, etc.
 
 program:
-    statement ';' program                       { printf("statement\n"); }
+    statement ';' program                       { debugPrintf("statement\n"); }
     | /* NULL */
     | ';' program
     ;
 
 statement:
-    initialization                                                      { printf("initialization\n");}
-    | WHILE '(' expression ')' scope                                    { printf("while\n");}
-    | REPEAT scope UNTIL '(' expression ')'                             { printf("repeat\n");}
-    | FOR '(' initialization ';' expression ';' assignment ')' scope    { printf("for\n");}
-    | SWITCH '(' expression ')' '{' case '}'                            { printf("switch\n");}
-    | scope                                                             { printf("scope\n");}
-    | IF '(' expression ')' THEN scope                                  { printf("if\n");}
-    | IF '(' expression ')' THEN scope ELSE scope                       { printf("if else\n");}
-    | FUNCTION dataType VARIABLE '(' arguments ')' scope                { 
-                                                                            void* parametersList = $5;
-                                                                            void* function = createFunction($2,$3,parametersList,yylineno);
-                                                                            addSymbolToSymbolTable(function);
-                                                                        }
-    | FUNCTION VOID VARIABLE '(' arguments ')' scope                    { 
-                                                                            void* parametersList = $5;
-                                                                            void* function = createFunction(VOID_T,$3,parametersList,yylineno);
-                                                                            addSymbolToSymbolTable(function);
-                                                                        }
-    | functionCall                                                      { printf("function call\n"); }
-    | RETURN assignmentValue                                            { printf("return\n");}
-    | RETURN                                                            { printf("return\n");}
+    initialization                                                      { debugPrintf("initialization\n");}
+    | WHILE '(' expression ')' scope                                    { debugPrintf("while\n");}
+    | REPEAT scope UNTIL '(' expression ')'                             { debugPrintf("repeat\n");}
+    | FOR '(' forLoopInitialization ';' expression ';' assignment ')' scope    { debugPrintf("for\n");}
+                                                                        //TODO: visibility of variables
+    | SWITCH '(' expression ')' '{' case '}'                            { debugPrintf("switch\n");}
+    | scope                                                             { debugPrintf("scope\n");}
+    | IF '(' expression ')' THEN scope                                  { debugPrintf("if\n");}
+    | IF '(' expression ')' THEN scope ELSE scope                       { debugPrintf("if else\n");}
+    | FUNCTION_SIGNATURE scope                                          {  debugPrintf("function signature\n"); }
+                                                                        //TODO: visibility of variables
+    | functionCall                                                      { debugPrintf("function call\n"); }
+    | RETURN assignmentValue                                            { debugPrintf("return\n");}
+                                                                        //check return type
+    | RETURN                                                            { debugPrintf("return\n");}                                                               
+    ;
+
+FUNCTION_SIGNATURE:
+    FUNCTION dataType VARIABLE '(' arguments ')'       { 
+                                                            void* parametersList = $5;
+                                                            void* function = createFunction($2,$3,parametersList,yylineno);
+                                                            addSymbolToSymbolTable(function);
+                                                        }
+    | FUNCTION VOID VARIABLE '(' arguments ')'         { 
+                                                            void* parametersList = $5;
+                                                            void* function = createFunction(VOID_T,$3,parametersList,yylineno);
+                                                            addSymbolToSymbolTable(function);
+                                                        }
+    ;
+
+forLoopInitialization:
+    assignment |
+    //NULL
     ;
 
 initialization:
-    declaration                                 { printf("declaration\n"); }
-    | assignment                                { printf("assignment\n"); }
+    declaration                                 { debugPrintf("declaration\n"); }
+    | assignment                                { debugPrintf("assignment\n"); }
     ;
 
 scope:
-    '{' program '}'
+    SCOPE_OPEN program SCOPE_CLOSE                             { debugPrintf("Inside scope\n"); }
+    ;
+
+SCOPE_OPEN:
+    '{'                                         { 
+                                                    debugPrintf("Scope Open\n"); 
+                                                    enterScope();
+                                                }
+    ;
+
+SCOPE_CLOSE:
+    '}'                                         { 
+                                                    debugPrintf("Scope Close\n");
+                                                    printSymbolTable();
+                                                    exitScope(yylineno);
+                                                }
     ;
 
 declaration:
@@ -111,7 +138,7 @@ declaration:
                                                         addSymbolToSymbolTable(variable);
                                                         
                                                         #ifdef DEBUG
-                                                            printf("Variable: %s = %s\n", varName, assignmentName);
+                                                            debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         #endif
 
                                                         addQuadruple("=", assignmentName, "", varName);
@@ -127,7 +154,7 @@ declaration:
                                                         addSymbolToSymbolTable(variable);
                                                        
                                                         #ifdef DEBUG
-                                                            printf("Variable: %s = %s\n", varName, assignmentName);
+                                                            debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         #endif
                                                        
                                                         
@@ -150,18 +177,20 @@ assignment:
                                             void* variable = getSymbolFromSymbolTable(varName,yylineno);
                                             Type assignmentType = $3->type;
                                             Type variableType = getSymbolType(variable);
-
+                                            
+                                            checkVariableIsNotConstant(variable, yylineno);
                                             checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
                                             
 
                                             #ifdef DEBUG
-                                                printf("Assignment\n");
-                                                printf("Variable: %s = %s\n", varName, valName);
+                                                debugPrintf("Assignment\n");
+                                                debugPrintf("Variable: %s = %s\n", varName, valName);
                                             #endif
                                             
                                             addQuadruple("=", valName, "", varName);
                                             
                                         }
+                                       
     ;
 
 assignmentValue:
@@ -176,7 +205,7 @@ assignmentValue:
                                                     $$ = returnValue;
 
                                                     #ifdef DEBUG
-                                                        printf("Setting character with value: %c\n", *(char*)($$->value));
+                                                        debugPrintf("Setting character with value: %c\n", *(char*)($$->value));
                                                     #endif
                                                 }
     | CHARARRAY                                 {
@@ -189,7 +218,7 @@ assignmentValue:
                                                     $$ = returnValue;
 
                                                     #ifdef DEBUG
-                                                        printf("Setting string with value: %s\n", (char*)$$->value);
+                                                        debugPrintf("Setting string with value: %s\n", (char*)$$->value);
                                                     #endif
                                                 }
     | functionCall                              { $$ = $1; }
@@ -232,7 +261,7 @@ expression:
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
-                                        printf("Setting integer with value: %s\n", convertIntNumToChar(*(int*)($$->value)));
+                                        debugPrintf("Setting integer with value: %s\n", convertIntNumToChar(*(int*)($$->value)));
                                     #endif
 
                                 }
@@ -272,9 +301,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif 
                                 }
     | expression '-' expression {
@@ -296,9 +325,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif 
                                 }
     | expression '*' expression {
@@ -320,9 +349,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif 
                                 }
     | expression '/' expression {
@@ -344,9 +373,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif 
                                 }
     | expression '^' expression {
@@ -368,9 +397,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif 
                                 }
     | '-' expression             {
@@ -398,9 +427,9 @@ expression:
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
-                                        printf("Name of expression: %s\n", exprName);
-                                        printf("Name of result: %s\n", tempVar);
-                                        printf("Value of result: %s\n", convertNumToChar($$->value,$$->type));
+                                        debugPrintf("Name of expression: %s\n", exprName);
+                                        debugPrintf("Name of result: %s\n", tempVar);
+                                        debugPrintf("Value of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif
                                  }
     | expression '||' expression {
@@ -422,9 +451,9 @@ expression:
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif
                                  }
     | expression '&&' expression {
@@ -446,9 +475,9 @@ expression:
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression '<' expression  {
@@ -471,9 +500,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression '>' expression {
@@ -496,9 +525,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression GE expression  {
@@ -521,9 +550,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression LE expression    {
@@ -546,9 +575,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression EQ expression  {
@@ -559,7 +588,7 @@ expression:
                                     const char* expr2Name = $3->name;
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
-                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
                                     addQuadruple("==", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
@@ -571,9 +600,9 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression NE expression  {
@@ -584,7 +613,7 @@ expression:
                                     const char* expr2Name = $3->name;
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
-                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
                                     addQuadruple("!=", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
@@ -596,16 +625,19 @@ expression:
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
-                                        printf("Name of first expression: %s\n", expr1Name);
-                                        printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
+                                        debugPrintf("Name of first expression: %s\n", expr1Name);
+                                        debugPrintf("Name of second expression: %s\n", expr2Name);
+                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | '(' expression ')'        { $$ = $2; }
     ;
 
 arguments:
-    argumentsList  { $$ = $1; }
+    argumentsList   {     
+                          debugPrintf("Arguments\n");
+                          $$ = $1;
+                    }
     | /* NULL */   { $$ = createArgumentList(); }
     ;
 
@@ -648,7 +680,7 @@ case:
 
 caseCondition:
     CHAR
-    | INTEGER
+    | INTEGER //TODO: check type of param checking on
     ;
 
 %%
@@ -664,14 +696,14 @@ int main(int argc, char **argv) {
     // yydebug = 1;
 
     if(argc != 2) {
-        printf("Usage: %s <input file>\n", argv[0]);
+        debugPrintf("Usage: %s <input file>\n", argv[0]);
         return 1;
     }
 
     // Open the input file
     yyin = fopen(argv[1], "r");
     if(yyin == NULL) {
-        printf("Error: Unable to open file %s\n", argv[1]);
+        debugPrintf("Error: Unable to open file %s\n", argv[1]);
         return 1;
     }
     
@@ -679,7 +711,7 @@ int main(int argc, char **argv) {
     yyparse();
     // printSymbolTable();
     printSymbolTable();
-    printQuadruples();
+    // printQuadruples();
     // Close the input file
     fclose(yyin);
     return 0;

@@ -4,11 +4,38 @@
 // bison --yacc -d parser.y
 // gcc .\lex.yy.c .\y.tab.c -o parser
 // .\parser.exe
-
-function int test_function() {
-    int flag = 5;
-    //ret 3;
-    return 3;
+bool g = True;
+if(g == True) then {
+    g = False;
 };
-test_function(5);
-//bool x = (5);
+
+int y;
+const int xx = 5;
+{
+    int x = 5;
+    y = x + 1;
+    {
+        x = 10;
+        y = x + 1;
+        int z = 20;
+        {
+            int w;
+            y = x + z;
+            function void test_function(int a, char b, string c) {
+                return;
+            };
+        };
+    };
+};
+
+{
+
+function void abc(int a, char b, string c) {
+    return;
+};
+
+function void xyz(int a, char b, string c) {
+    return;
+};
+
+};

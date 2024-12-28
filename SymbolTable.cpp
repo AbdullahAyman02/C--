@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstring>
 
+#include "Vendor/VariadicTable.h"
 #include "common.h"
 static string getTypeName(Type type);
 
@@ -12,16 +13,17 @@ Symbol::Symbol(string name, Type type, int line) {
     this->line = line;
 }
 
-void Symbol::print() {
-    cout << "General Symbol" << " " << this->name << endl;
+void Symbol::print(VariadicTable<string, string, string, string>& vt) {
+    cout << this->getName() << "   " << "Symbol" << "   " << getTypeName(this->getType()) << "   " << " - " << endl;
 }
 
 string Symbol::getName() {
     return this->name;
 }
 
-Variable::Variable(Type type, string name, int line, bool isConstant) : Symbol(name, type, line) {
+Variable::Variable(Type type, string name, int line, bool isConstant, bool isFuncArgument) : Symbol(name, type, line) {
     this->isConstant = isConstant;
+    this->isFuncArg = isFuncArgument;
 }
 
 int Symbol::getLine() {
@@ -32,12 +34,22 @@ Type Symbol::getType() {
     return this->type;
 }
 
-void Variable::print() {
-    cout << "Variable" << " " << this->getName() << " Type " << getTypeName(this->getType()) << endl;
+void Variable::print(VariadicTable<string, string, string, string>& vt) {
+    string kind = this->getIsFuncArg() ? "Arg" : "Var";
+    string otherColumn = (this->getIsConstant()) ? "Const" : " - ";
+    vt.addRow(this->getName(), kind, getTypeName(this->getType()), otherColumn);
 }
 
 bool Variable::getIsConstant() {
-    return false;
+    return this->isConstant;
+}
+
+bool Variable::getIsFuncArg() {
+    return this->isFuncArg;
+}
+
+void Variable::setIsFuncArg(bool isFuncArg) {
+    this->isFuncArg = isFuncArg;
 }
 
 Function::Function(string name, Type returnType, vector<Variable*>* arguments, int line) : Symbol(name, returnType, line) {
@@ -48,16 +60,12 @@ vector<Variable*>* Function::getArguments() {
     return this->arguments;
 }
 
-void Function::print() {
-    cout << "Function" << " " << this->getName() << endl;
-    cout << "Return type: " << getTypeName(this->getType()) << endl;
-    cout << "Parameters: " << endl;
-    if (this->arguments == nullptr) {
-        cout << "None" << endl;
-        return;
-    }
+void Function::print(VariadicTable<string, string, string, string>& vt) {
+    int argumentCount = this->arguments->size();
+    string arguments = "args Cnt = " + to_string(argumentCount);
+    vt.addRow(this->getName(), "func", getTypeName(this->getType()), arguments);
     for (Variable* param : *this->arguments) {
-        param->print();
+        param->print(vt);
     }
 }
 
@@ -98,23 +106,62 @@ SymbolTable* SymbolTable::createChild() {
 }
 
 void SymbolTable::print() {
+    VariadicTable<string, string, string, string> vt({"Name", "Kind", "Type", "Other"});
     for (auto it = this->symbols.begin(); it != this->symbols.end(); ++it) {
-        it->second->print();
+        it->second->print(vt);
     }
+    vt.print(cout);
 }
 
 static SymbolTable globalSymbolTable;
 static SymbolTable* currentSymbolTable = &globalSymbolTable;
 static string getTypeName(Type type);
+
+struct FunctionMetadata {
+    bool isDataUsedInScopeCheck;
+    vector<Variable*>* arguments;
+};
+
+static vector<FunctionMetadata> functionArgumentsList;
+
 extern "C" {
+
+static void pushFunctionArgumentListIfExistsToScopeSymbolTable() {
+    if (functionArgumentsList.empty()) {
+        return;
+    }
+    FunctionMetadata& functionMetadata = functionArgumentsList.back();
+    if (functionMetadata.isDataUsedInScopeCheck) {
+        return;
+    }
+    for (auto arg : *functionMetadata.arguments) {
+        try {
+            currentSymbolTable->insert(arg);
+        } catch (string e) {
+            exitOnError(e.c_str(), arg->getLine());
+        }
+    }
+    functionMetadata.isDataUsedInScopeCheck = true;
+}
+
+static void popFunctionArgumentListIfExists() {
+    if (functionArgumentsList.empty()) {
+        return;
+    }
+    functionArgumentsList.pop_back();
+}
 
 void enterScope() {
     currentSymbolTable = currentSymbolTable->createChild();
+    pushFunctionArgumentListIfExistsToScopeSymbolTable();
 }
 
-void exitScope() {
+void exitScope(int line) {
     SymbolTable* parent = currentSymbolTable->getParent();
-    exitOnError("Cannot exit global scope", 0);
+    if (parent == nullptr) {
+        exitOnError("Cannot exit global scope", line);
+    }
+    popFunctionArgumentListIfExists();
     currentSymbolTable = parent;
 }
 
@@ -135,7 +182,13 @@ void* createVariable(Type type, const char* name, int line, int isConstant) {
 void* createFunction(Type returnType, const char* name, void* paramList, int line) {
     vector<Variable*>* arguments = (vector<Variable*>*)paramList;
     reverse(arguments->begin(), arguments->end());
+
+    for (auto arg : *arguments) {
+        arg->setIsFuncArg(true);
+    }
+
     Function* function = new Function(name, returnType, arguments, line);
+
     return (void*)function;
 }
 
@@ -146,6 +199,14 @@ void* getSymbolFromSymbolTable(const char* name, int line) {
         exitOnError(message.c_str(), line);
     }
     return (void*)symbol;
+}
+
+void checkVariableIsNotConstant(void* symbol, int line) {
+    Variable* var = (Variable*)symbol;
+    if (var->getIsConstant()) {
+        string message = "Variable " + var->getName() + " is constant";
+        exitOnError(message.c_str(), line);
+    }
 }
 
 void checkBothParamsAreNumbers(Type type1, Type type2, int line) {
@@ -205,7 +266,8 @@ Type getSymbolType(void* symbol) {
 }
 
 void* createArgumentList() {
-    return (void*)new vector<Variable*>();
+    functionArgumentsList.push_back({false, new vector<Variable*>()});
+    return (void*)functionArgumentsList.back().arguments;
 }
 
 void addVariableToArgumentList(void* paramList, void* variable) {

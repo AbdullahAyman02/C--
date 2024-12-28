@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Vendor/VariadicTable.h"
 #include "common.h"
 using namespace std;
 
@@ -16,7 +17,7 @@ class Symbol {
    public:
     Symbol(string name, Type type, int line);
     Symbol() = default;
-    virtual void print();
+    virtual void print(VariadicTable<string, string, string, string>& vt);
     string getName();
     int getLine();
     Type getType();
@@ -25,11 +26,14 @@ class Symbol {
 class Variable : public Symbol {
    private:
     bool isConstant;
+    bool isFuncArg;
 
    public:
-    Variable(Type type, string name, int line, bool isConstant);
-    void print() override;
+    Variable(Type type, string name, int line, bool isConstant, bool isFuncArg = false);
+    void print(VariadicTable<string, string, string, string>& vt) override;
     bool getIsConstant();
+    bool getIsFuncArg();
+    void setIsFuncArg(bool isFuncArg);
 };
 
 class Function : public Symbol {
@@ -39,7 +43,7 @@ class Function : public Symbol {
    public:
     Function(string name, Type returnType, vector<Variable*>* arguments, int line);
     vector<Variable*>* getArguments();
-    void print() override;
+    void print(VariadicTable<string, string, string, string>& vt) override;
 };
 
 class SymbolTable {

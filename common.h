@@ -5,6 +5,14 @@
 extern "C" {
 #endif
 
+// #define DEBUG
+
+#ifdef DEBUG
+#define debugPrintf(...) printf(__VA_ARGS__)
+#else
+#define debugPrintf(...)
+#endif
+
 typedef enum {
     INTEGER_T,
     FLOAT_T,
@@ -23,7 +31,7 @@ typedef struct {
 const char* exprToString(ExprValue* exprValue);
 
 void enterScope();
-void exitScope();
+void exitScope(int line);
 void addSymbolToSymbolTable(void* symbol);
 void* createVariable(Type type, const char* name, int line, int isConstant);
 void* getSymbolFromSymbolTable(const char* name, int line);
@@ -40,6 +48,7 @@ void* createFunction(Type returnType, const char* name, void* paramList, int lin
 void* createParamList();
 void addTypeToParamList(void* paramList, Type type);
 void checkParamListAgainstFunction(void* paramList, void* function, int line);
+void checkVariableIsNotConstant(void* symbol, int line);
 
 void addQuadruple(const char* op, const char* arg1, const char* arg2, const char* result);
 const char* newTemp();
