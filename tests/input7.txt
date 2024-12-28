@@ -1,13 +1,28 @@
 int y;
 y = 1;
 switch (y) {
-    case 5 : {
+    case 5 : { 
         bool flag = True;
     }
     case 10 : {
         bool flag = True;
     }
-    case 10 : {
-        bool flag = True;
+    case 15: {
+        bool flag1 = True;
+    }
+    case 20: {
+        bool flag10 = True;
     }
 };
+
+/*y == 5;
+JFALSE L0:
+
+
+JUMP L1;
+L0: y==10;
+JFALSE L2:
+
+JUMP L1;
+L2:
+L1:*/
