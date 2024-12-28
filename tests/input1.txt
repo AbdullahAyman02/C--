@@ -1,37 +1,41 @@
-{int y = 2;
-float z = 3; 
-string var = "test";
-char c = 'c';
-const char d = 'd';
-bool flag = TRUE;
-switch (y) {
-    case 2: {
-    flag = True;
-    repeat {
-        x = 7.3;
-    } until (flag == False);
-        function int test_function() {
-            flag = True;
-            //ret 3;
-            return 3;
+// To compile and run
+// Run in the terminal the following commands:
+// flex lexer.l
+// bison --yacc -d parser.y
+// gcc .\lex.yy.c .\y.tab.c -o parser
+// .\parser.exe
+bool g = True;
+if(g == True) then {
+    g = False;
+};
+
+int y;
+const int xx = 5;
+{
+    int x = 5;
+    y = x + 1;
+    {
+        x = 10;
+        y = x + 1;
+        int z = 20;
+        {
+            int w;
+            y = x + z;
+            function void test_function(int a, char b, string c) {
+                return;
+            };
         };
-    }
+    };
 };
 
-if (c == d) then {
-    flag = True;
-}
-else {
-    flag = False;
-};
-if (y + z < y - z) then {
-    flag = False;
-};
+{
 
-
-
-};
-
-function void void_function(int a, char b, string c) {
+function void abc(int a, char b, string c) {
     return;
+};
+
+function void xyz(int a, char b, string c) {
+    return;
+};
+
 };

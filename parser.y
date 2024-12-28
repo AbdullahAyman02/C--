@@ -49,9 +49,9 @@
 %left '*' '/'
 %right '^'          // right associative token. This means that the token is evaluated from right to left a ^ b ^ c -> a ^ (b ^ c)
 
-%type <type> dataType
-%type <exprValue> expression functionCall falseJMP elseJMP
-%type <list> arguments argumentsList parameters parametersList
+%type <type> dataType 
+%type <exprValue> expression functionCall falseJMP elseJMP caseCondition
+%type <list> arguments argumentsList parameters parametersList case
 
 %%
 // The grammar rules are defined here. The grammar rules define the structure of the language. They define how the tokens are combined to form statements, expressions, etc.
@@ -100,8 +100,12 @@ statement:
     | WHILE '(' expression ')' scope                                    { debugPrintf("while\n");}
     | REPEAT scope UNTIL '(' expression ')'                             { debugPrintf("repeat\n");}
     | FOR '(' forLoopInitialization ';' expression ';' assignment ')' scope    { debugPrintf("for\n");}
-                                                                        //TODO: visibility of variables
-    | SWITCH '(' expression ')' '{' case '}'                            { debugPrintf("switch\n");}
+    | SWITCH '(' expression ')' '{' case '}'                            { 
+                                                                            void* switchCaseList = $6;
+                                                                            ExprValue* switchExpression = $3;
+                                                                            Type expressionType = switchExpression->type;
+                                                                            checkSwitchCaseListAgainstType(switchCaseList,expressionType);
+                                                                        }
     | scope                                                             { debugPrintf("scope\n");}
     | IF '(' expression ')' falseJMP THEN scope                         { 
                                                                             printf("if\n");
@@ -112,11 +116,17 @@ statement:
                                                                             addQuadruple($8->name, "", "", "");
                                                                         }
     | FUNCTION_SIGNATURE scope                                          {  debugPrintf("function signature\n"); }
-                                                                        //TODO: visibility of variables
+                                                                        
     | functionCall                                                      { debugPrintf("function call\n"); }
-    | RETURN expression                                                 { debugPrintf("return\n");}
+    | RETURN expression                                                 { 
+                                                                            ExprValue* returnValue = $2;
+                                                                            Type returnType = returnValue->type;
+                                                                            checkReturnStatementIsValid(returnType,yylineno);
+                                                                        }
                                                                         //check return type
-    | RETURN                                                            { debugPrintf("return\n");}                                                               
+    | RETURN                                                            { 
+                                                                            checkReturnStatementIsValid(VOID_T,yylineno);
+                                                                        }                                                               
     ;
 
 FUNCTION_SIGNATURE:
@@ -172,7 +182,8 @@ declaration:
                                                         Type varType = $1;
                                                         Type assignmentType = $4->type;
                                                         void* variable = createVariable(varType,varName, yylineno,0);
-                                                        
+                                                        setVariableAsInitialized(variable);
+
                                                         checkBothParamsAreOfSameType(varType,assignmentType,yylineno);
                                                         addSymbolToSymbolTable(variable);
                                                         
@@ -191,7 +202,9 @@ declaration:
                                                         Type variableType = $2;
                                                         checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
                                                         addSymbolToSymbolTable(variable);
-                                                       
+                                                        
+                                                        setVariableAsInitialized(variable);
+                                                        
                                                         #ifdef DEBUG
                                                             debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         #endif
@@ -217,6 +230,8 @@ assignment:
                                             Type assignmentType = $3->type;
                                             Type variableType = getSymbolType(variable);
                                             
+                                            setVariableAsInitialized(variable);
+
                                             checkVariableIsNotConstant(variable, yylineno);
                                             checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
                                             
@@ -236,7 +251,7 @@ expression:
     VARIABLE                    { 
                                     const char* val = strdup($1);
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
-                                    void* variable = getSymbolFromSymbolTable(val,yylineno);
+                                    void* variable = getVariableFromSymbolTable(val,yylineno);
                                     returnValue->type = getSymbolType(variable);
                                     returnValue->value = (void*)val;
                                     returnValue->name = val;
@@ -712,13 +727,37 @@ parametersList:
     ;
 
 case:
-    CASE caseCondition ':' scope
-    | CASE caseCondition ':' scope case
+    CASE caseCondition ':' scope            {
+                                                ExprValue* caseValue = $2;
+                                                void* caseList = createSwitchCaseList();
+                                                Type caseType = caseValue->type;
+                                                int caseLine = caseValue->line;
+                                                addCaseToSwitchCaseList(caseList,caseType,caseLine);
+                                                $$ = caseList;
+                                            }
+    | CASE caseCondition ':' scope case     {
+                                                ExprValue* caseValue = $2;
+                                                void* caseList = $5;
+                                                Type caseType = caseValue->type;
+                                                int caseLine = caseValue->line;
+                                                addCaseToSwitchCaseList(caseList,caseType,caseLine);
+                                                $$ = caseList;
+                                            }
     ;
 
 caseCondition:
-    CHAR
-    | INTEGER //TODO: check type of param checking on
+    CHARACTER                       {   
+                                        ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                        returnValue->type = CHAR_T;
+                                        returnValue->line = yylineno;
+                                        $$ = returnValue; 
+                                    }
+    | INTEGER                       {
+                                        ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                        returnValue->type = INTEGER_T;
+                                        returnValue->line = yylineno;
+                                        $$ = returnValue; 
+                                    }
     ;
 
 %%

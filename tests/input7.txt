@@ -1,0 +1,13 @@
+int y;
+y = 1;
+switch (y) {
+    case 5 : {
+        bool flag = True;
+    }
+    case 10 : {
+        bool flag = True;
+    }
+    case 10 : {
+        bool flag = True;
+    }
+};

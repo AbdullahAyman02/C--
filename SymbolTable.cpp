@@ -49,6 +49,14 @@ bool Variable::getIsFuncArg() {
     return this->isFuncArg;
 }
 
+bool Variable::getIsInitialized() {
+    return this->isInitialized;
+}
+
+void Variable::setIsInitialized(bool isInitialized) {
+    this->isInitialized = isInitialized;
+}
+
 void Variable::setIsFuncArg(bool isFuncArg) {
     this->isFuncArg = isFuncArg;
 }
@@ -68,6 +76,14 @@ void Function::print(VariadicTable<string, string, string, string>& vt) {
     for (Variable* param : *this->arguments) {
         param->print(vt);
     }
+}
+
+bool Function::getIsReturnStatementPresent() {
+    return this->isReturnStatementPresent;
+}
+
+void Function::setIsReturnStatementPresent(bool isReturnStatementPresent) {
+    this->isReturnStatementPresent = isReturnStatementPresent;
 }
 
 SymbolTable::SymbolTable() {
@@ -119,38 +135,89 @@ static SymbolTable* currentSymbolTable = &globalSymbolTable;
 static string getTypeName(Type type);
 
 struct FunctionMetadata {
-    bool isDataUsedInScopeCheck;
-    vector<Variable*>* arguments;
+    bool isFunctionConsumedInScopeCheck;
+    Function* function;
 };
 
-static vector<FunctionMetadata> functionArgumentsList;
+struct SwitchCaseMetadata {
+    Type type;
+    int line;
+};
+
+static vector<FunctionMetadata> functionContext;
 
 extern "C" {
 
 static void pushFunctionArgumentListIfExistsToScopeSymbolTable() {
-    if (functionArgumentsList.empty()) {
+    if (functionContext.empty() || functionContext.back().function == nullptr || functionContext.back().isFunctionConsumedInScopeCheck) {
+        functionContext.push_back({true, nullptr});
         return;
     }
-    FunctionMetadata& functionMetadata = functionArgumentsList.back();
-    if (functionMetadata.isDataUsedInScopeCheck) {
+    FunctionMetadata& functionMetadata = functionContext.back();
+    if (functionMetadata.isFunctionConsumedInScopeCheck) {
         return;
     }
-    for (auto arg : *functionMetadata.arguments) {
+    for (auto arg : *functionMetadata.function->getArguments()) {
         try {
-            Variable* var = new Variable(arg->getType(), arg->getName(), arg->getLine(), arg->getIsConstant());
+            Variable* var = new Variable(arg->getType(), arg->getName(), arg->getLine(), arg->getIsConstant(), false, true);
             currentSymbolTable->insert(var);
         } catch (string e) {
             exitOnError(e.c_str(), arg->getLine());
         }
     }
-    functionMetadata.isDataUsedInScopeCheck = true;
+    functionMetadata.isFunctionConsumedInScopeCheck = true;
 }
 
-static void popFunctionArgumentListIfExists() {
-    if (functionArgumentsList.empty()) {
+static void checkReturnStatementIsPresent(Function* function) {
+    if (function == nullptr) {
         return;
     }
-    functionArgumentsList.pop_back();
+
+    if (function->getType() == VOID_T) {
+        return;
+    }
+
+    if (!function->getIsReturnStatementPresent()) {
+        string message = "Function " + function->getName() + " does not have a return statement";
+        exitOnError(message.c_str(), function->getLine());
+    }
+};
+
+static void popFunctionArgumentListIfExists() {
+    if (functionContext.empty()) {
+        return;
+    }
+    Function* function = functionContext.back().function;
+    functionContext.pop_back();
+
+    checkReturnStatementIsPresent(function);
+}
+
+static Function* getCurrentFunction() {
+    if (functionContext.empty()) {
+        return nullptr;
+    }
+    for (auto it = functionContext.rbegin(); it != functionContext.rend(); ++it) {
+        if (it->function != nullptr) {
+            return it->function;
+        }
+    }
+    return nullptr;
+}
+
+void checkReturnStatementIsValid(Type returnType, int line) {
+    Function* currentFunction = getCurrentFunction();
+    if (currentFunction == nullptr) {
+        exitOnError("Return statement outside of function", line);
+    }
+
+    if (currentFunction->getType() != returnType) {
+        string message = "Return type mismatch. Expected " + getTypeName(currentFunction->getType());
+        message += " but got " + getTypeName(returnType);
+        exitOnError(message.c_str(), line);
+    }
+
+    currentFunction->setIsReturnStatementPresent(true);
 }
 
 void enterScope() {
@@ -187,9 +254,12 @@ void* createFunction(Type returnType, const char* name, void* paramList, int lin
 
     for (auto arg : *arguments) {
         arg->setIsFuncArg(true);
+        arg->setIsInitialized(true);
     }
 
     Function* function = new Function(name, returnType, arguments, line);
+
+    functionContext.push_back({false, function});
 
     return (void*)function;
 }
@@ -201,6 +271,25 @@ void* getSymbolFromSymbolTable(const char* name, int line) {
         exitOnError(message.c_str(), line);
     }
     return (void*)symbol;
+}
+
+void setVariableAsInitialized(void* symbol) {
+    Variable* var = (Variable*)symbol;
+    var->setIsInitialized(true);
+}
+
+void* getVariableFromSymbolTable(const char* name, int line) {
+    Symbol* symbol = (Symbol*)getSymbolFromSymbolTable(name, line);
+    Variable* var = dynamic_cast<Variable*>(symbol);
+    if (var == nullptr) {
+        string message = "Symbol " + string(name) + " is not a variable";
+        exitOnError(message.c_str(), line);
+    }
+    if (!var->getIsInitialized()) {
+        string message = "Variable " + string(name) + " is not initialized";
+        exitOnError(message.c_str(), line);
+    }
+    return (void*)var;
 }
 
 void checkVariableIsNotConstant(void* symbol, int line) {
@@ -235,14 +324,6 @@ void checkBothParamsAreBoolean(Type type1, Type type2, int line) {
     checkBothParamsAreOfSameType(type1, type2, line);
 }
 
-void useVariableFromSymbolTable(const char* name) {
-    Symbol* symbol = currentSymbolTable->lookup(name);
-    Variable* var = dynamic_cast<Variable*>(symbol);
-    if (var == nullptr) {
-        return;
-    }
-}
-
 void checkBothParamsAreOfSameType(Type type1, Type type2, int line) {
     if (type1 != type2) {
         string message = "Parameters are not of the same type ";
@@ -269,8 +350,7 @@ Type getSymbolType(void* symbol) {
 }
 
 void* createArgumentList() {
-    functionArgumentsList.push_back({false, new vector<Variable*>()});
-    return (void*)functionArgumentsList.back().arguments;
+    return (void*)new vector<Variable*>();
 }
 
 void addVariableToArgumentList(void* paramList, void* variable) {
@@ -324,6 +404,25 @@ const char* convertNumToChar(void* num, Type type) {
         return convertFloatNumToChar(*(float*)num);
     }
     return convertIntNumToChar(*(int*)num);
+}
+
+void* createSwitchCaseList() {
+    return (void*)new vector<SwitchCaseMetadata>();
+}
+
+void addCaseToSwitchCaseList(void* switchCaseList, Type type, int line) {
+    vector<SwitchCaseMetadata>* switchCases = (vector<SwitchCaseMetadata>*)switchCaseList;
+    switchCases->push_back({type, line});
+}
+
+void checkSwitchCaseListAgainstType(void* switchCaseList, Type type) {
+    vector<SwitchCaseMetadata>* switchCases = (vector<SwitchCaseMetadata>*)switchCaseList;
+    for (SwitchCaseMetadata switchCase : *switchCases) {
+        if (switchCase.type != type) {
+            string message = "Switch case expects type " + getTypeName(type) + " but got " + getTypeName(switchCase.type);
+            exitOnError(message.c_str(), switchCase.line);
+        }
+    }
 }
 }
 

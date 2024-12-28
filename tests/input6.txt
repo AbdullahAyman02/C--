@@ -1,0 +1,28 @@
+// To compile and run
+// Run in the terminal the following commands:
+// flex lexer.l
+// bison --yacc -d parser.y
+// gcc .\lex.yy.c .\y.tab.c -o parser
+// .\parser.exe
+
+char c = 'x';
+int y = 5;
+{
+    if(2+3) then {
+    //
+    int z;
+    };
+ // push function power
+ // if consumed => push
+    function void power(int base, int exponent) {
+
+        if (exponent == 0) then {
+            return;
+        };
+        int z = y;
+        
+    };
+    power(2, 3);
+
+};
+

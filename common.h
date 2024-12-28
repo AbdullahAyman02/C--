@@ -26,6 +26,7 @@ typedef struct {
     Type type;
     void* value;
     const char* name;
+    int line;
 } ExprValue;
 
 const char* exprToString(ExprValue* exprValue);
@@ -49,6 +50,13 @@ void* createParamList();
 void addTypeToParamList(void* paramList, Type type);
 void checkParamListAgainstFunction(void* paramList, void* function, int line);
 void checkVariableIsNotConstant(void* symbol, int line);
+void* getVariableFromSymbolTable(const char* name, int line);
+void setVariableAsInitialized(void* symbol);
+void checkReturnStatementIsValid(Type returnType, int line);
+
+void* createSwitchCaseList();
+void addCaseToSwitchCaseList(void* switchCaseList, Type type, int line);
+void checkSwitchCaseListAgainstType(void* switchCaseList, Type type);
 
 void addQuadruple(const char* op, const char* arg1, const char* arg2, const char* result);
 const char* newTemp();

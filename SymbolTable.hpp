@@ -34,17 +34,22 @@ class Variable : public Symbol {
     void print(VariadicTable<string, string, string, string>& vt) override;
     bool getIsConstant();
     bool getIsFuncArg();
+    bool getIsInitialized();
+    void setIsInitialized(bool isInitialized);
     void setIsFuncArg(bool isFuncArg);
 };
 
 class Function : public Symbol {
    private:
     vector<Variable*>* arguments;
+    bool isReturnStatementPresent = false;
 
    public:
     Function(string name, Type returnType, vector<Variable*>* arguments, int line);
     vector<Variable*>* getArguments();
     void print(VariadicTable<string, string, string, string>& vt) override;
+    bool getIsReturnStatementPresent();
+    void setIsReturnStatementPresent(bool isReturnStatementPresent);
 };
 
 class SymbolTable {
