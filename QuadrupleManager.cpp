@@ -43,4 +43,74 @@ const char *newLabel() {
 void printQuadruples() {
     quadrupleManager.printQuadruples();
 }
+
+static float *castExprToFloat(ExprValue *expr1, ExprValue *expr2, char operation, int line) {
+    float *result = new float();
+
+    switch (operation) {
+        case '+':
+            *result = *(float *)expr1->value + *(float *)expr2->value;
+            break;
+        case '-':
+            *result = *(float *)expr1->value - *(float *)expr2->value;
+            break;
+        case '*':
+            *result = *(float *)expr1->value * *(float *)expr2->value;
+            break;
+        case '/':
+            if (*(float *)expr2->value == 0) {
+                exitOnError("Division by zero", 0);
+            }
+            *result = *(float *)expr1->value / *(float *)expr2->value;
+            break;
+        case '^':
+            *result = 1;
+            for (int i = 0; i < *(int *)expr2->value; i++) {
+                *result *= *(float *)expr1->value;
+            }
+            break;
+    }
+
+    return result;
+}
+
+static int *castExprToInt(ExprValue *expr1, ExprValue *expr2, char operation, int line) {
+    int *result = new int();
+
+    switch (operation) {
+        case '+':
+            *result = *(int *)expr1->value + *(int *)expr2->value;
+            break;
+        case '-':
+            *result = *(int *)expr1->value - *(int *)expr2->value;
+            break;
+        case '*':
+            *result = *(int *)expr1->value * *(int *)expr2->value;
+            break;
+        case '/':
+            if (*(int *)expr2->value == 0) {
+                exitOnError("Division by zero", 0);
+            }
+            *result = *(int *)expr1->value / *(int *)expr2->value;
+            break;
+        case '^':
+            *result = 1;
+            for (int i = 0; i < *(int *)expr2->value; i++) {
+                *result *= *(int *)expr1->value;
+            }
+            break;
+    }
+
+    return result;
+}
+
+void *castExpressions(ExprValue *expr1, ExprValue *expr2, char operation, Type *castedType, int line) {
+    if (expr1->type == FLOAT_T || expr2->type == FLOAT_T) {
+        *castedType = FLOAT_T;
+        return castExprToFloat(expr1, expr2, operation, line);
+    }
+
+    *castedType = INTEGER_T;
+    return castExprToInt(expr1, expr2, operation, line);
+}
 }

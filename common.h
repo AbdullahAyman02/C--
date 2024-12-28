@@ -48,7 +48,9 @@ void printQuadruples();
 
 const char* convertFloatNumToChar(float num);
 const char* convertIntNumToChar(int num);
+const char* convertNumToChar(void* num, Type type);
 
+void* castExpressions(ExprValue* expr1, ExprValue* expr2, char operation, Type* castedType, int line);
 #ifdef __cplusplus
 }
 #endif

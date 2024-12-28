@@ -225,12 +225,14 @@ expression:
                                     const char* val = strdup(convertIntNumToChar($1));
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     returnValue->type = INTEGER_T;
-                                    returnValue->value = (void*)val;
+                                    int* valInt = (int*)malloc(sizeof(int));
+                                    *valInt = $1;
+                                    returnValue->value = (void*)valInt;
                                     returnValue->name = val;
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
-                                        printf("Setting integer with value: %d\n", *(int*)($$->value));
+                                        printf("Setting integer with value: %s\n", convertIntNumToChar(*(int*)($$->value)));
                                     #endif
 
                                 }
@@ -252,6 +254,8 @@ expression:
                                     $$ = returnValue;
                                 }
     | expression '+' expression {
+                                    ExprValue* expr1 = $1;
+                                    ExprValue* expr2 = $3;
                                     Type expr1Type = $1->type;
                                     Type expr2Type = $3->type;
                                     const char* tempVar = newTemp();
@@ -263,17 +267,19 @@ expression:
                                     addQuadruple("+", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = (void*)tempVar;
+                                    returnValue->value = castExpressions(expr1,expr2,'+',&returnValue->type,yylineno);
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif 
                                 }
     | expression '-' expression {
+                                    ExprValue* expr1 = $1;
+                                    ExprValue* expr2 = $3;
                                     Type expr1Type = $1->type;
                                     Type expr2Type = $3->type;
                                     const char* tempVar = newTemp();
@@ -285,17 +291,19 @@ expression:
                                     addQuadruple("-", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = (void*)tempVar;
+                                    returnValue->value = castExpressions(expr1,expr2,'-',&returnValue->type,yylineno);
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
-                                    #endif
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                    #endif 
                                 }
     | expression '*' expression {
+                                    ExprValue* expr1 = $1;
+                                    ExprValue* expr2 = $3;
                                     Type expr1Type = $1->type;
                                     Type expr2Type = $3->type;
                                     const char* tempVar = newTemp();
@@ -307,17 +315,19 @@ expression:
                                     addQuadruple("*", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = (void*)tempVar;
+                                    returnValue->value = castExpressions(expr1,expr2,'*',&returnValue->type,yylineno);
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
-                                    #endif
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                    #endif 
                                 }
     | expression '/' expression {
+                                    ExprValue* expr1 = $1;
+                                    ExprValue* expr2 = $3;
                                     Type expr1Type = $1->type;
                                     Type expr2Type = $3->type;
                                     const char* tempVar = newTemp();
@@ -329,17 +339,19 @@ expression:
                                     addQuadruple("/", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = (void*)tempVar;
+                                    returnValue->value = castExpressions(expr1,expr2,'/',&returnValue->type,yylineno);
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
-                                    #endif
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                    #endif 
                                 }
     | expression '^' expression {
+                                     ExprValue* expr1 = $1;
+                                    ExprValue* expr2 = $3;
                                     Type expr1Type = $1->type;
                                     Type expr2Type = $3->type;
                                     const char* tempVar = newTemp();
@@ -351,15 +363,15 @@ expression:
                                     addQuadruple("^", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = (void*)tempVar;
+                                    returnValue->value = castExpressions(expr1,expr2,'^',&returnValue->type,yylineno);
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
-                                    #endif
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
+                                    #endif 
                                 }
     | '-' expression             {
                                     const char* tempVar = newTemp();
@@ -370,7 +382,17 @@ expression:
                                     checkParamIsNumber(exprType,yylineno);
 
                                     returnValue->type = exprType;
-                                    returnValue->value = (void*)tempVar;
+                                    
+                                    if (exprType == INTEGER_T) {
+                                        int *val = (int*)malloc(sizeof(int)); 
+                                        *val = -1 * *(int*)$2->value;
+                                        returnValue->value = (void*)val;
+                                    } else {
+                                        float *val = (float*)malloc(sizeof(float));
+                                        *val = -1 * *(float*)$2->value;
+                                        returnValue->value = (void*)val;
+                                    }
+
                                     returnValue->name = tempVar;
                                     addQuadruple("Minus", "", exprName, tempVar);
                                     $$ = returnValue;
@@ -378,6 +400,7 @@ expression:
                                     #ifdef DEBUG
                                         printf("Name of expression: %s\n", exprName);
                                         printf("Name of result: %s\n", tempVar);
+                                        printf("Value of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif
                                  }
     | expression '||' expression {
@@ -390,14 +413,18 @@ expression:
                                     checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
                                     addQuadruple("||", expr1Name, expr2Name, tempVar);
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
+                                    
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(int*)$1->value || *(int*)$3->value;
+                                    returnValue->value = (void*)val;
+
                                     returnValue->name = tempVar;
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif
                                  }
     | expression '&&' expression {
@@ -409,15 +436,19 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
                                     addQuadruple("&&", expr1Name, expr2Name, tempVar);
+
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(int*)$1->value && *(int*)$3->value;
+                                    returnValue->value = (void*)val;
+
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression '<' expression  {
@@ -431,15 +462,18 @@ expression:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadruple("<", expr1Name, expr2Name, tempVar);
 
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(float*)$1->value < *(float*)$3->value;
+                                    returnValue->value = (void*)val;
+                                    
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression '>' expression {
@@ -453,15 +487,18 @@ expression:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadruple(">", expr1Name, expr2Name, tempVar);
 
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(float*)$1->value > *(float*)$3->value;
+                                    returnValue->value = (void*)val;
+
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression GE expression  {
@@ -475,15 +512,18 @@ expression:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadruple(">=", expr1Name, expr2Name, tempVar);
 
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(float*)$1->value >= *(float*)$3->value;
+                                    returnValue->value = (void*)val;
+
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression LE expression    {
@@ -496,16 +536,19 @@ expression:
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadruple("<=", expr1Name, expr2Name, tempVar);
+                                    
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(float*)$1->value <= *(float*)$3->value;
+                                    returnValue->value = (void*)val;
 
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression EQ expression  {
@@ -519,15 +562,18 @@ expression:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadruple("==", expr1Name, expr2Name, tempVar);
 
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(float*)$1->value == *(float*)$3->value;
+                                    returnValue->value = (void*)val;
+                                    
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | expression NE expression  {
@@ -541,15 +587,18 @@ expression:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadruple("!=", expr1Name, expr2Name, tempVar);
 
+                                    int *val = (int*)malloc(sizeof(int));
+                                    *val = *(float*)$1->value != *(float*)$3->value;
+                                    returnValue->value = (void*)val;
+
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)tempVar;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
                                     #ifdef DEBUG
                                         printf("Name of first expression: %s\n", expr1Name);
                                         printf("Name of second expression: %s\n", expr2Name);
-                                        printf("Name of result: %s\n", tempVar);
+                                        printf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
     | '(' expression ')'        { $$ = $2; }

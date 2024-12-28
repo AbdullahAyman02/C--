@@ -253,6 +253,13 @@ const char* convertIntNumToChar(int num) {
     string str = to_string(num);
     return strdup(str.c_str());
 }
+
+const char* convertNumToChar(void* num, Type type) {
+    if (type == FLOAT_T) {
+        return convertFloatNumToChar(*(float*)num);
+    }
+    return convertIntNumToChar(*(int*)num);
+}
 }
 
 static string getTypeName(Type type) {
