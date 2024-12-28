@@ -7,7 +7,7 @@ import subprocess
 import threading
 import time
 
-temp_path = "temp_input.txt"
+temp_path = "temp/temp_input.txt"
 
 class CompilerGUI:
     def __init__(self, root):

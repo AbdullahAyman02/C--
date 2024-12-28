@@ -9,3 +9,4 @@ parser
 *.o
 
 .vscode/
+temp/
