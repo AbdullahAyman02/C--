@@ -1,0 +1,11 @@
+int y = 20;
+int i;
+for (i = 0; i<10; i = i + 1){
+    int z = 0;
+    z = z + 5;
+    int j;
+    for (j = i; j<y; j = j+ 1){
+        int x = i;
+    };
+
+};
