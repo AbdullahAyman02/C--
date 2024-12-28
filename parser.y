@@ -50,7 +50,7 @@
 %right '^'          // right associative token. This means that the token is evaluated from right to left a ^ b ^ c -> a ^ (b ^ c)
 
 %type <type> dataType 
-%type <exprValue> expression functionCall falseJMP elseJMP caseCondition CASE_EXPRESSION
+%type <exprValue> expression functionCall  caseCondition CASE_EXPRESSION
 %type <list> arguments argumentsList parameters parametersList case SCOPE_CLOSE scope
 
 %%
@@ -60,39 +60,6 @@ program:
     statement ';' program                       { debugPrintf("statement\n"); }
     | /* NULL */
     | ';' program
-    ;
-
-falseJMP:
-    
-    { 
-        printf("falseJMP\n");
-        $$ = $<exprValue>-1;  // Get expression from IF rule
-        // Print the data of the token
-        printf("Name: %s\n", $$->name);
-        printf("Type: %d\n", $$->type);
-        printf("Value: %s\n", convertNumToChar($$->value,$$->type));
-        // Create new label
-        const char* label = newLabel();
-        addQuadrupleToCurrentQuadManager("ifFalse", $$->name, "", label);
-        $$->name = label;
-    }
-    ;
-
-elseJMP:
-    { 
-        printf("elseJMP\n");
-        $$ = $<exprValue>-2;  // Get expression from IF rule
-        // Print the data of the token
-        printf("Name: %s\n", $$->name);
-        printf("Type: %d\n", $$->type);
-        printf("Value: %s\n", convertNumToChar($$->value,$$->type));
-        // Add the quadruple of the label to the ELSE block
-        const char* label = newLabel();
-        addQuadrupleToCurrentQuadManager("jmp", "", "", label);
-        addQuadrupleToCurrentQuadManager($$->name, "", "", "");
-        $$->name = label;
-        // Create new label for ending IF block
-    }
     ;
 
 statement:
@@ -114,13 +81,40 @@ statement:
                                                                             mergeQuadManagerToCurrentQuadManager(quadManager);
                                                                         }
     | scope                                                             { debugPrintf("scope\n");}
-    | IF '(' expression ')' falseJMP  THEN scope                         { 
-                                                                            printf("if\n");
-                                                                            addQuadrupleToCurrentQuadManager($5->name, "", "", "");
-                                                                        }
-    | IF '(' expression ')' falseJMP THEN scope elseJMP ELSE scope      {
-                                                                            printf("if else\n");
-                                                                            addQuadrupleToCurrentQuadManager($8->name, "", "", "");
+    | IF '(' expression ')' THEN scope                                  { 
+                                                                            debugPrintf("if\n");
+
+                                                                            const char* label = newLabel();
+                                                                            ExprValue* expr = $3;
+                                                                            const char* exprName = expr->name;
+                                                                            addQuadrupleToCurrentQuadManager("JF", exprName, "", label);
+
+                                                                            void* quadManager = $6;
+                                                                            mergeQuadManagerToCurrentQuadManager(quadManager);
+                                                                            
+                                                                            addQuadrupleToCurrentQuadManager(label, "", "", "");
+                                                                         }
+    | IF '(' expression ')'  THEN scope ELSE scope      {
+                                                                            debugPrintf("if else\n");
+
+                                                                            const char* elseLabel = newLabel();
+                                                                            ExprValue* expr = $3;
+                                                                            const char* exprName = expr->name;
+                                                                            addQuadrupleToCurrentQuadManager("JF", exprName, "", elseLabel);
+
+                                                                            void* scopeMgr1 = $6;
+                                                                            mergeQuadManagerToCurrentQuadManager(scopeMgr1);
+                                                                            
+                                                                            const char* endLabel = newLabel();
+                                                                            addQuadrupleToCurrentQuadManager("jmp", "", "", endLabel);
+
+                                                                            addQuadrupleToCurrentQuadManager(elseLabel, "", "", "");
+
+                                                                            void* scopeMgr2 = $8;
+                                                                            mergeQuadManagerToCurrentQuadManager(scopeMgr2);
+
+                                                                            addQuadrupleToCurrentQuadManager(endLabel, "", "", "");
+
                                                                         }
     | FUNCTION_SIGNATURE scope                                          {  debugPrintf("function signature\n"); }
                                                                         
@@ -758,7 +752,7 @@ case:
                                                 const char* caseExpression = getCurrentCaseExpression();
                                                 
                                                 const char* tempVar = newTemp();
-                                                addQuadrupleToQuadManagerInFront(quadManager,"jmpFalse", tempVar, "", label);
+                                                addQuadrupleToQuadManagerInFront(quadManager,"JF", tempVar, "", label);
                                                 addQuadrupleToQuadManagerInFront(quadManager,"==", caseExpression, caseValue->name, tempVar);
 
                                                 addQuadrupleToQuadManager(quadManager,"jmp", "", "", exitLabel);
@@ -780,7 +774,7 @@ case:
                                                 const char* caseExpression = getCurrentCaseExpression();
                                                 
                                                 const char* tempVar = newTemp();
-                                                addQuadrupleToQuadManagerInFront(quadManager,"jmpFalse", tempVar, "", label);
+                                                addQuadrupleToQuadManagerInFront(quadManager,"JF", tempVar, "", label);
                                                 addQuadrupleToQuadManagerInFront(quadManager,"==", caseExpression, caseValue->name, tempVar);
 
                                                 addQuadrupleToQuadManager(quadManager,"jmp", "", "", exitLabel);
