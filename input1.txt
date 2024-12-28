@@ -6,9 +6,9 @@
 // .\parser.exe
 
 function int test_function() {
-    flag = True;
+    int flag = 5;
     //ret 3;
     return 3;
 };
-
-bool x = (3<test_function());
+test_function(5);
+//bool x = (5);

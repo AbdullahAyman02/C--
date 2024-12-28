@@ -41,6 +41,14 @@ void* createParamList();
 void addTypeToParamList(void* paramList, Type type);
 void checkParamListAgainstFunction(void* paramList, void* function, int line);
 
+void addQuadruple(const char* op, const char* arg1, const char* arg2, const char* result);
+const char* newTemp();
+const char* newLabel();
+void printQuadruples();
+
+const char* convertFloatNumToChar(float num);
+const char* convertIntNumToChar(int num);
+
 #ifdef __cplusplus
 }
 #endif

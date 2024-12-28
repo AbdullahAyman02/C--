@@ -10,7 +10,7 @@ bison:
 	bison --yacc -d -v parser.y
 
 gcc:
-	g++ -c y.tab.c
-	g++ -c lex.yy.c
-	g++ -c common.c
+	gcc -c y.tab.c
+	gcc -c lex.yy.c
+	gcc -c common.c
 	g++ -std=c++11 -o parser y.tab.o lex.yy.o common.o Quadruple.cpp QuadrupleManager.cpp SymbolTable.cpp

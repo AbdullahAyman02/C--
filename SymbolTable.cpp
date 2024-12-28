@@ -243,6 +243,16 @@ void checkParamListAgainstFunction(void* paramList, void* function, int line) {
         }
     }
 }
+
+const char* convertFloatNumToChar(float num) {
+    string str = to_string(num);
+    return str.c_str();
+}
+
+const char* convertIntNumToChar(int num) {
+    string str = to_string(num);
+    return strdup(str.c_str());
+}
 }
 
 static string getTypeName(Type type) {

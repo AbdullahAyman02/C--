@@ -1,9 +1,7 @@
 %{
     #include "common.h"
-    #include "QuadrupleManager.hpp"
     #include <stdio.h>      // for functions like printf and scanf
     #include <string.h>     // for string functions like strdup
-    #include <cmath>        // for math functions like pow
     void yyerror(char *);   // for error handling. This function is called when an error occurs
     int yylex(void);        // for lexical analysis. This function is called to get the next token
     extern FILE *yyin;      // for file handling. This is the input file. The default is stdin
@@ -11,8 +9,7 @@
     extern char *yytext;    // for token text. This variable stores the current token text
     #define YYDEBUG 1       // for debugging. If set to 1, the parser will print the debugging information
     extern int yydebug;     // for debugging. This variable stores the current debugging level
-
-    QuadrupleManager quadManager;
+    #define DEBUG
 %}
 
 // The union is used to define the types of the tokens. Since the datatypes that we will work with are  either int/float, char/string, and boolean, we will use a union to define the types of the tokens   
@@ -104,22 +101,37 @@ declaration:
                                                         addSymbolToSymbolTable(variable);
                                                 }
     | dataType VARIABLE '=' assignmentValue     { 
-                                                        void* variable = createVariable($1,$2, yylineno,0);
+                                                        const char* varName = $2;
+                                                        const char* assignmentName = $4->name;
+                                                        Type varType = $1;
                                                         Type assignmentType = $4->type;
-                                                        Type variableType = $1;
-                                                        checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
+                                                        void* variable = createVariable(varType,varName, yylineno,0);
+                                                        
+                                                        checkBothParamsAreOfSameType(varType,assignmentType,yylineno);
                                                         addSymbolToSymbolTable(variable);
-                                                        printf("Variable: %s = %s\n", $2, $4->name);
-                                                        quadManager.addQuadruple("=", std::string($4->name), "", std::string($2));
+                                                        
+                                                        #ifdef DEBUG
+                                                            printf("Variable: %s = %s\n", varName, assignmentName);
+                                                        #endif
+
+                                                        addQuadruple("=", assignmentName, "", varName);
                                                 }
-    | CONST dataType VARIABLE '=' assignmentValue { 
-                                                        void* variable = createVariable($2,$3, yylineno,1);
+    | CONST dataType VARIABLE '=' assignmentValue {     
+                                                        Type varType = $2;
+                                                        const char* varName = $3;
+                                                        const char* assignmentName = $5->name;
+                                                        void* variable = createVariable(varType,varName, yylineno,1);
                                                         Type assignmentType = $5->type;
                                                         Type variableType = $2;
                                                         checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
                                                         addSymbolToSymbolTable(variable);
-                                                        printf("Variable: %s = %s\n", $3, $5->name);
-                                                        quadManager.addQuadruple("=", std::string($5->name), "", std::string($3));
+                                                       
+                                                        #ifdef DEBUG
+                                                            printf("Variable: %s = %s\n", varName, assignmentName);
+                                                        #endif
+                                                       
+                                                        
+                                                        addQuadruple("=", assignmentName, "", varName);
                                                   }
     ;
 
@@ -133,337 +145,412 @@ dataType:
 
 assignment:
     VARIABLE '=' assignmentValue        {
-                                            printf("Assignment\n");
-                                            void* variable = getSymbolFromSymbolTable($1,yylineno);
+                                            const char* varName = $1;
+                                            const char* valName = $3->name;
+                                            void* variable = getSymbolFromSymbolTable(varName,yylineno);
                                             Type assignmentType = $3->type;
                                             Type variableType = getSymbolType(variable);
+
                                             checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
-                                            // Print variable with its value
-                                            printf("Variable: %s = %s\n", $1, $3->name);
-                                            quadManager.addQuadruple("=", std::string($3->name), "", std::string($1));
+                                            
+
+                                            #ifdef DEBUG
+                                                printf("Assignment\n");
+                                                printf("Variable: %s = %s\n", varName, valName);
+                                            #endif
+                                            
+                                            addQuadruple("=", valName, "", varName);
+                                            
                                         }
     ;
 
 assignmentValue:
     expression                                  { $$ = $1; }
     | CHARACTER                                 { 
-                                                    $$ = new ExprValue;
-                                                    $$->type = CHAR_T;
-                                                    char* val = new char($1);  // Allocate new char with value
-                                                    $$->value = (void*)val;
-                                                    $$->name = strdup(std::string(1, $1).c_str());  // Convert char to string
-                                                    printf("Setting character with value: %c\n", *(char*)($$->value));
+                                                    const char* val = strdup(&($1));
+                                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                                    
+                                                    returnValue->type = CHAR_T;
+                                                    returnValue->value = (void*)val;
+                                                    returnValue->name = val;
+                                                    $$ = returnValue;
+
+                                                    #ifdef DEBUG
+                                                        printf("Setting character with value: %c\n", *(char*)($$->value));
+                                                    #endif
                                                 }
     | CHARARRAY                                 {
-                                                    $$ = new ExprValue;
-                                                    $$->type = STRING_T;
-                                                    char* val = strdup($1);  // Make a copy of the string
-                                                    $$->value = (void*)val;  // Store pointer to the copy
-                                                    $$->name = strdup($1);   // Store name as string
-                                                    printf("Setting string with value: %s\n", (char*)$$->value);
+                                                    const char* val = strdup($1);
+                                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                                    
+                                                    returnValue->type = STRING_T;
+                                                    returnValue->value = (void*)val;
+                                                    returnValue->name = val;
+                                                    $$ = returnValue;
+
+                                                    #ifdef DEBUG
+                                                        printf("Setting string with value: %s\n", (char*)$$->value);
+                                                    #endif
                                                 }
     | functionCall                              { $$ = $1; }
     ;
 
 functionCall:
     VARIABLE '(' parameters ')'     {
-                                        void* function = getSymbolFromSymbolTable($1,yylineno);
+                                        const char* functionName = strdup($1);
+                                        void* function = getSymbolFromSymbolTable(functionName,yylineno);
                                         void* parametersList = $3;
                                         checkParamListAgainstFunction(parametersList,function,yylineno);
-                                        $$ = new ExprValue;  // Allocate new ExprValue
-                                        $$->type = getSymbolType(function);
-                                        char* val = strdup($1);  // Allocate copy of function name
-                                        $$->value = (void*)val;
-                                        $$->name = strdup($1);   // Allocate another copy for name
+                                        ExprValue *returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                        
+                                        returnValue->type = getSymbolType(function);
+                                        returnValue->value = (void*)functionName;
+                                        returnValue->name = functionName;   
+
+                                        $$ = returnValue;
                                     }
     ;
 
 expression:
     VARIABLE                    { 
-                                    void* variable = getSymbolFromSymbolTable($1,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = getSymbolType(variable);
-                                    char* val = strdup($1);  // Allocate copy of variable name
-                                    $$->value = (void*)val;
-                                    $$->name = strdup($1);
+                                    const char* val = strdup($1);
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    void* variable = getSymbolFromSymbolTable(val,yylineno);
+                                    returnValue->type = getSymbolType(variable);
+                                    returnValue->value = (void*)val;
+                                    returnValue->name = val;
+                                    $$ = returnValue;
                                 }
     | INTEGER                   { 
-        $$ = new ExprValue; 
-        $$->type = INTEGER_T; 
-        printf("Setting integer with type: %d\n", $$->type);
-        printf("Setting integer with value: %d\n", $1);
-        int* val = new int($1);  // Allocate new int with value
-        $$->value = (void*)val; 
-        printf("Set integer with value: %d\n", *(int*)($$->value));
-        $$->name = strdup(std::to_string($1).c_str()); 
-        printf("Setting integer with name: %s\n", $$->name);
-        }
-    | FLOATING                  { 
-                                    $$ = new ExprValue; 
-                                    $$->type = FLOAT_T; 
-                                    float* val = new float($1); 
-                                    $$->value = (void*)val; 
-                                    $$->name = strdup(std::to_string($1).c_str());
+                                    const char* val = strdup(convertIntNumToChar($1));
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    returnValue->type = INTEGER_T;
+                                    returnValue->value = (void*)val;
+                                    returnValue->name = val;
+                                    $$ = returnValue;
+
+                                    #ifdef DEBUG
+                                        printf("Setting integer with value: %d\n", *(int*)($$->value));
+                                    #endif
+
+                                }
+    | FLOATING                  {             
+                                    const char* val = strdup(convertFloatNumToChar($1));
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    returnValue->type = FLOAT_T;
+                                    returnValue->value = (void*)val;
+                                    returnValue->name = val;
+                                    $$ = returnValue;
+
                                 }
     | BOOLEAN                   { 
-                                    $$ = new ExprValue; 
-                                    $$->type = BOOLEAN_T; 
-                                    int* val = new int($1); 
-                                    $$->value = (void*)val; 
-                                    $$->name = strdup(std::to_string($1).c_str());
+                                    const char* val = strdup(convertIntNumToChar($1));
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)val;
+                                    returnValue->name = val;
+                                    $$ = returnValue;
                                 }
     | expression '+' expression {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("+", std::string($1->name), std::string($3->name), temp);
-                                    $$ = new ExprValue;
-                                    // Handle integer and float addition properly
-                                    if ($1->type == INTEGER_T && $3->type == INTEGER_T) {
-                                        int* result = new int(*(int*)($1->value) + *(int*)($3->value));
-                                        $$->value = (void*)result;
-                                        $$->type = INTEGER_T;
-                                    } else {
-                                        float* result = new float();
-                                        if ($1->type == INTEGER_T)
-                                            *result = (float)(*(int*)($1->value)) + *(float*)($3->value);
-                                        else if ($3->type == INTEGER_T)
-                                            *result = *(float*)($1->value) + (float)(*(int*)($3->value));
-                                        else
-                                            *result = *(float*)($1->value) + *(float*)($3->value);
-                                        $$->value = (void*)result;
-                                        $$->type = FLOAT_T;
-                                    }
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("+", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = expr1Type;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif 
                                 }
     | expression '-' expression {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("-", std::string($1->name), std::string($3->name), temp);
-                                    $$ = new ExprValue;
-                                    // Handle integer and float subtraction properly
-                                    if ($1->type == INTEGER_T && $3->type == INTEGER_T) {
-                                        int* result = new int(*(int*)($1->value) - *(int*)($3->value));
-                                        $$->value = (void*)result;
-                                        $$->type = INTEGER_T;
-                                    } else {
-                                        float* result = new float();
-                                        if ($1->type == INTEGER_T)
-                                            *result = (float)(*(int*)($1->value)) - *(float*)($3->value);
-                                        else if ($3->type == INTEGER_T)
-                                            *result = *(float*)($1->value) - (float)(*(int*)($3->value));
-                                        else
-                                            *result = *(float*)($1->value) - *(float*)($3->value);
-                                        $$->value = (void*)result;
-                                        $$->type = FLOAT_T;
-                                    }
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("-", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = expr1Type;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                 }
     | expression '*' expression {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("*", std::string($1->name), std::string($3->name), temp);
-                                    $$ = new ExprValue;
-                                    // Handle integer and float multiplication properly
-                                    if ($1->type == INTEGER_T && $3->type == INTEGER_T) {
-                                        int* result = new int(*(int*)($1->value) * *(int*)($3->value));
-                                        $$->value = (void*)result;
-                                        $$->type = INTEGER_T;
-                                    } else {
-                                        float* result = new float();
-                                        if ($1->type == INTEGER_T)
-                                            *result = (float)(*(int*)($1->value)) * *(float*)($3->value);
-                                        else if ($3->type == INTEGER_T)
-                                            *result = *(float*)($1->value) * (float)(*(int*)($3->value));
-                                        else
-                                            *result = *(float*)($1->value) * *(float*)($3->value);
-                                        $$->value = (void*)result;
-                                        $$->type = FLOAT_T;
-                                    }
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("*", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = expr1Type;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                 }
     | expression '/' expression {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("/", std::string($1->name), std::string($3->name), temp);
-                                    $$ = new ExprValue;
-                                    // Handle integer and float division properly
-                                    if ($1->type == INTEGER_T && $3->type == INTEGER_T) {
-                                        int* result = new int(*(int*)($1->value) / *(int*)($3->value));
-                                        $$->value = (void*)result;
-                                        $$->type = INTEGER_T;
-                                    } else {
-                                        float* result = new float();
-                                        if ($1->type == INTEGER_T)
-                                            *result = (float)(*(int*)($1->value)) / *(float*)($3->value);
-                                        else if ($3->type == INTEGER_T)
-                                            *result = *(float*)($1->value) / (float)(*(int*)($3->value));
-                                        else
-                                            *result = *(float*)($1->value) / *(float*)($3->value);
-                                        $$->value = (void*)result;
-                                        $$->type = FLOAT_T;
-                                    }
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("/", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = expr1Type;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                 }
     | expression '^' expression {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("^", std::string($1->name), std::string($3->name), temp);
-                                    $$ = new ExprValue;
-                                    // Handle integer and float exponentiation properly
-                                    if ($1->type == INTEGER_T && $3->type == INTEGER_T) {
-                                        int* result = new int(pow(*(int*)($1->value), *(int*)($3->value)));
-                                        $$->value = (void*)result;
-                                        $$->type = INTEGER_T;
-                                    } else {
-                                        float* result = new float();
-                                        if ($1->type == INTEGER_T)
-                                            *result = pow((float)(*(int*)($1->value)), *(float*)($3->value));
-                                        else if ($3->type == INTEGER_T)
-                                            *result = pow(*(float*)($1->value), (float)(*(int*)($3->value)));
-                                        else
-                                            *result = pow(*(float*)($1->value), *(float*)($3->value));
-                                        $$->value = (void*)result;
-                                        $$->type = FLOAT_T;
-                                    }
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("^", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = expr1Type;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                 }
     | '-' expression             {
-                                    checkParamIsNumber($2->type,yylineno);
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $2->name);
-                                    quadManager.addQuadruple("Minus", "", std::string($2->name), temp);
-                                    $$ = new ExprValue;
-                                    // Handle integer and float negation properly
-                                    if ($2->type == INTEGER_T) {
-                                        int* result = new int(-*(int*)($2->value));
-                                        $$->value = (void*)result;
-                                        $$->type = INTEGER_T;
-                                    } else {
-                                        float* result = new float(-*(float*)($2->value));
-                                        $$->value = (void*)result;
-                                        $$->type = FLOAT_T;
-                                    }
-                                    $$->name = strdup(temp.c_str());
+                                    const char* tempVar = newTemp();
+                                    const char* exprName = $2->name;
+                                    Type exprType = $2->type;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    
+                                    checkParamIsNumber(exprType,yylineno);
+
+                                    returnValue->type = exprType;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    addQuadruple("Minus", "", exprName, tempVar);
+                                    $$ = returnValue;
+
+                                    #ifdef DEBUG
+                                        printf("Name of expression: %s\n", exprName);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression '||' expression {
-                                    checkBothParamsAreBoolean($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) || *(int*)($3->value));
-                                    $$->value = (void*)result;
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("||", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("||", expr1Name, expr2Name, tempVar);
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression '&&' expression {
-                                    checkBothParamsAreBoolean($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) && *(int*)($3->value));
-                                    $$->value = (void*)result;
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("&&", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("&&", expr1Name, expr2Name, tempVar);
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression '<' expression  {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) < *(int*)($3->value));
-                                    $$->value = (void*)result;  
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("<", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("<", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression '>' expression {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) > *(int*)($3->value));
-                                    $$->value = (void*)result;
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple(">", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple(">", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression GE expression  {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) >= *(int*)($3->value));
-                                    $$->value = (void*)result;
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple(">=", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple(">=", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression LE expression    {
-                                    checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) <= *(int*)($3->value));
-                                    $$->value = (void*)result;
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("<=", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("<=", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression EQ expression  {
-                                    checkBothParamsAreOfSameType($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) == *(int*)($3->value));
-                                    $$->value = (void*)result;
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("==", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("==", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | expression NE expression  {
-                                    checkBothParamsAreOfSameType($1->type,$3->type,yylineno);
-                                    $$ = new ExprValue;
-                                    $$->type = BOOLEAN_T;
-                                    int* result = new int(*(int*)($1->value) != *(int*)($3->value));
-                                    $$->value = (void*)result;
-                                    std::string temp = quadManager.newTemp();
-                                    printf("Name of result: %s\n", temp.c_str());
-                                    printf("Name of first: %s\n", $1->name);
-                                    printf("Name of second: %s\n", $3->name);
-                                    quadManager.addQuadruple("!=", std::string($1->name), std::string($3->name), temp);
-                                    $$->name = strdup(temp.c_str());
+                                    Type expr1Type = $1->type;
+                                    Type expr2Type = $3->type;
+                                    const char* tempVar = newTemp();
+                                    const char* expr1Name = $1->name;
+                                    const char* expr2Name = $3->name;
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+
+                                    checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
+                                    addQuadruple("!=", expr1Name, expr2Name, tempVar);
+
+                                    returnValue->type = BOOLEAN_T;
+                                    returnValue->value = (void*)tempVar;
+                                    returnValue->name = tempVar;
+                                    $$ = returnValue;  
+
+                                    #ifdef DEBUG
+                                        printf("Name of first expression: %s\n", expr1Name);
+                                        printf("Name of second expression: %s\n", expr2Name);
+                                        printf("Name of result: %s\n", tempVar);
+                                    #endif
                                  }
     | '(' expression ')'        { $$ = $2; }
     ;
@@ -542,7 +629,8 @@ int main(int argc, char **argv) {
     // Call the parser
     yyparse();
     // printSymbolTable();
-    quadManager.printQuadruples();
+    printSymbolTable();
+    printQuadruples();
     // Close the input file
     fclose(yyin);
     return 0;
