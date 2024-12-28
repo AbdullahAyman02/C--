@@ -50,8 +50,8 @@
 %right '^'          // right associative token. This means that the token is evaluated from right to left a ^ b ^ c -> a ^ (b ^ c)
 
 %type <type> dataType 
-%type <exprValue> expression functionCall falseJMP elseJMP caseCondition
-%type <list> arguments argumentsList parameters parametersList case
+%type <exprValue> expression functionCall falseJMP elseJMP caseCondition CASE_EXPRESSION
+%type <list> arguments argumentsList parameters parametersList case SCOPE_CLOSE scope
 
 %%
 // The grammar rules are defined here. The grammar rules define the structure of the language. They define how the tokens are combined to form statements, expressions, etc.
@@ -73,7 +73,7 @@ falseJMP:
         printf("Value: %s\n", convertNumToChar($$->value,$$->type));
         // Create new label
         const char* label = newLabel();
-        addQuadruple("ifFalse", $$->name, "", label);
+        addQuadrupleToCurrentQuadManager("ifFalse", $$->name, "", label);
         $$->name = label;
     }
     ;
@@ -88,8 +88,8 @@ elseJMP:
         printf("Value: %s\n", convertNumToChar($$->value,$$->type));
         // Add the quadruple of the label to the ELSE block
         const char* label = newLabel();
-        addQuadruple("jmp", "", "", label);
-        addQuadruple($$->name, "", "", "");
+        addQuadrupleToCurrentQuadManager("jmp", "", "", label);
+        addQuadrupleToCurrentQuadManager($$->name, "", "", "");
         $$->name = label;
         // Create new label for ending IF block
     }
@@ -100,20 +100,27 @@ statement:
     | WHILE '(' expression ')' scope                                    { debugPrintf("while\n");}
     | REPEAT scope UNTIL '(' expression ')'                             { debugPrintf("repeat\n");}
     | FOR '(' forLoopInitialization ';' expression ';' assignment ')' scope    { debugPrintf("for\n");}
-    | SWITCH '(' expression ')' '{' case '}'                            { 
+    | SWITCH '(' CASE_EXPRESSION ')' '{' case '}'                            { 
                                                                             void* switchCaseList = $6;
                                                                             ExprValue* switchExpression = $3;
                                                                             Type expressionType = switchExpression->type;
                                                                             checkSwitchCaseListAgainstType(switchCaseList,expressionType);
+
+                                                                            const char* exitLabel = getExitLabelFromCurrentQuadManager();
+                                                                            addQuadrupleToCurrentQuadManager(exitLabel, "", "", "");
+                                                                            removeLastCaseExpression();
+
+                                                                            void* quadManager = exitQuadManager();
+                                                                            mergeQuadManagerToCurrentQuadManager(quadManager);
                                                                         }
     | scope                                                             { debugPrintf("scope\n");}
-    | IF '(' expression ')' falseJMP THEN scope                         { 
+    | IF '(' expression ')' falseJMP  THEN scope                         { 
                                                                             printf("if\n");
-                                                                            addQuadruple($5->name, "", "", "");
+                                                                            addQuadrupleToCurrentQuadManager($5->name, "", "", "");
                                                                         }
     | IF '(' expression ')' falseJMP THEN scope elseJMP ELSE scope      {
                                                                             printf("if else\n");
-                                                                            addQuadruple($8->name, "", "", "");
+                                                                            addQuadrupleToCurrentQuadManager($8->name, "", "", "");
                                                                         }
     | FUNCTION_SIGNATURE scope                                          {  debugPrintf("function signature\n"); }
                                                                         
@@ -128,6 +135,14 @@ statement:
                                                                             checkReturnStatementIsValid(VOID_T,yylineno);
                                                                         }                                                               
     ;
+
+CASE_EXPRESSION:
+    expression                                          { 
+                                                            $$ = $1;
+                                                            const char* caseExpressionVariable = $1->name;
+                                                            enterQuadManager();
+                                                            addCaseExpression(caseExpressionVariable);
+                                                         }
 
 FUNCTION_SIGNATURE:
     FUNCTION dataType VARIABLE '(' arguments ')'       { 
@@ -153,13 +168,14 @@ initialization:
     ;
 
 scope:
-    SCOPE_OPEN program SCOPE_CLOSE                             { debugPrintf("Inside scope\n"); }
+    SCOPE_OPEN program SCOPE_CLOSE                             { $$ = $3; }
     ;
 
 SCOPE_OPEN:
     '{'                                         { 
                                                     debugPrintf("Scope Open\n"); 
                                                     enterScope();
+                                                    enterQuadManager();
                                                 }
     ;
 
@@ -167,6 +183,8 @@ SCOPE_CLOSE:
     '}'                                         { 
                                                     debugPrintf("Scope Close\n");
                                                     exitScope(yylineno);
+                                                    void* quadManager = exitQuadManager();
+                                                    $$ = quadManager;
                                                 }
     ;
 
@@ -190,7 +208,7 @@ declaration:
                                                             debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         #endif
 
-                                                        addQuadruple("=", assignmentName, "", varName);
+                                                        addQuadrupleToCurrentQuadManager("=", assignmentName, "", varName);
                                                 }
     | CONST dataType VARIABLE '=' expression {     
                                                         Type varType = $2;
@@ -209,7 +227,7 @@ declaration:
                                                         #endif
                                                        
                                                         
-                                                        addQuadruple("=", assignmentName, "", varName);
+                                                        addQuadrupleToCurrentQuadManager("=", assignmentName, "", varName);
                                                   }
     ;
 
@@ -240,7 +258,7 @@ assignment:
                                                 debugPrintf("Variable: %s = %s\n", varName, valName);
                                             #endif
                                             
-                                            addQuadruple("=", valName, "", varName);
+                                            addQuadrupleToCurrentQuadManager("=", valName, "", varName);
                                             
                                         }
                                        
@@ -328,7 +346,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("+", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("+", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'+',&returnValue->type,yylineno);
@@ -352,7 +370,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("-", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("-", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'-',&returnValue->type,yylineno);
@@ -376,7 +394,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("*", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("*", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'*',&returnValue->type,yylineno);
@@ -400,7 +418,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("/", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("/", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'/',&returnValue->type,yylineno);
@@ -424,7 +442,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("^", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("^", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'^',&returnValue->type,yylineno);
@@ -458,7 +476,7 @@ expression:
                                     }
 
                                     returnValue->name = tempVar;
-                                    addQuadruple("Minus", "", exprName, tempVar);
+                                    addQuadrupleToCurrentQuadManager("Minus", "", exprName, tempVar);
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
@@ -475,7 +493,7 @@ expression:
                                     const char* expr2Name = $3->name;
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("||", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("||", expr1Name, expr2Name, tempVar);
                                     returnValue->type = BOOLEAN_T;
                                     
                                     int *val = (int*)malloc(sizeof(int));
@@ -499,7 +517,7 @@ expression:
                                     const char* expr2Name = $3->name;
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("&&", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("&&", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(int*)$1->value && *(int*)$3->value;
@@ -524,7 +542,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("<", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("<", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value < *(float*)$3->value;
@@ -549,7 +567,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple(">", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager(">", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value > *(float*)$3->value;
@@ -574,7 +592,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple(">=", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager(">=", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value >= *(float*)$3->value;
@@ -599,7 +617,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("<=", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("<=", expr1Name, expr2Name, tempVar);
                                     
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value <= *(float*)$3->value;
@@ -624,7 +642,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("==", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("==", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value == *(float*)$3->value;
@@ -649,7 +667,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
-                                    addQuadruple("!=", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("!=", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value != *(float*)$3->value;
@@ -733,6 +751,20 @@ case:
                                                 int caseLine = caseValue->line;
                                                 addCaseToSwitchCaseList(caseList,caseType,caseLine);
                                                 $$ = caseList;
+
+                                                void* quadManager = $4;
+                                                const char* exitLabel = generateNewExitLabelFromCurrentQuadManager();
+                                                const char* label = newLabel();
+                                                const char* caseExpression = getCurrentCaseExpression();
+                                                
+                                                const char* tempVar = newTemp();
+                                                addQuadrupleToQuadManagerInFront(quadManager,"jmpFalse", tempVar, "", label);
+                                                addQuadrupleToQuadManagerInFront(quadManager,"==", caseExpression, caseValue->name, tempVar);
+
+                                                addQuadrupleToQuadManager(quadManager,"jmp", "", "", exitLabel);
+                                                addQuadrupleToQuadManager(quadManager,label, "", "", "");
+
+                                                mergeQuadManagerToCurrentQuadManagerInFront(quadManager);
                                             }
     | CASE caseCondition ':' scope case     {
                                                 ExprValue* caseValue = $2;
@@ -741,21 +773,45 @@ case:
                                                 int caseLine = caseValue->line;
                                                 addCaseToSwitchCaseList(caseList,caseType,caseLine);
                                                 $$ = caseList;
+
+                                                void* quadManager = $4;
+                                                const char* exitLabel = getExitLabelFromCurrentQuadManager();
+                                                const char* label = newLabel();
+                                                const char* caseExpression = getCurrentCaseExpression();
+                                                
+                                                const char* tempVar = newTemp();
+                                                addQuadrupleToQuadManagerInFront(quadManager,"jmpFalse", tempVar, "", label);
+                                                addQuadrupleToQuadManagerInFront(quadManager,"==", caseExpression, caseValue->name, tempVar);
+
+                                                addQuadrupleToQuadManager(quadManager,"jmp", "", "", exitLabel);
+                                                addQuadrupleToQuadManager(quadManager,label, "", "", "");
+                                                
+                                                mergeQuadManagerToCurrentQuadManagerInFront(quadManager);
                                             }
     ;
 
 caseCondition:
     CHARACTER                       {   
+                                        char* val = malloc(sizeof(char)*2);
+                                        val[0] = $1;
+                                        val[1] = '\0';
                                         ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
-                                        returnValue->type = CHAR_T;
                                         returnValue->line = yylineno;
-                                        $$ = returnValue; 
+                                        returnValue->type = CHAR_T;
+                                        returnValue->value = val;
+                                        returnValue->name = val;
+                                        $$ = returnValue;
                                     }
     | INTEGER                       {
+                                        const char* val = strdup(convertIntNumToChar($1));
                                         ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
-                                        returnValue->type = INTEGER_T;
                                         returnValue->line = yylineno;
-                                        $$ = returnValue; 
+                                        returnValue->type = INTEGER_T;
+                                        int* valInt = (int*)malloc(sizeof(int));
+                                        *valInt = $1;
+                                        returnValue->value = (void*)valInt;
+                                        returnValue->name = val;
+                                        $$ = returnValue;
                                     }
     ;
 

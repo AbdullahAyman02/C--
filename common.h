@@ -63,6 +63,20 @@ const char* newTemp();
 const char* newLabel();
 void printQuadruples();
 
+void enterQuadManager();
+void* exitQuadManager();
+void mergeQuadManagerToCurrentQuadManager(void* quadManager);
+void mergeQuadManagerToCurrentQuadManagerInFront(void* quadManager);
+void addQuadrupleToCurrentQuadManager(const char* op, const char* arg1, const char* arg2, const char* result);
+const char* generateNewExitLabelFromCurrentQuadManager();
+const char* getExitLabelFromCurrentQuadManager();
+void addQuadrupleToQuadManager(void* quadManager, const char* op, const char* arg1, const char* arg2, const char* result);
+void addQuadrupleToQuadManagerInFront(void* quadManager, const char* op, const char* arg1, const char* arg2, const char* result);
+
+void addCaseExpression(const char* expr);
+const char* getCurrentCaseExpression();
+void removeLastCaseExpression();
+
 const char* convertFloatNumToChar(float num);
 const char* convertIntNumToChar(int num);
 const char* convertNumToChar(void* num, Type type);
