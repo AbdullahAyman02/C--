@@ -1,0 +1,48 @@
+int y;
+y = 1;
+switch (y) {
+    case 5 : { 
+        bool flag = True;
+    }
+    case 10 : {
+        bool flag = True;
+    }
+    case 15: {
+        bool flag1 = True;
+    }
+    case 20: {
+        bool flag10 = True;
+    }
+};
+
+if (4 < 3) then {
+    int x = 7;
+    int z = x ^ 3;
+    if (3 == 2) then {
+        float lambda = 3.0;
+    } else {
+        char letter = 'c';
+
+        switch (y) {
+        case 5 : { 
+            bool flag = True;
+        }
+        case 10 : {
+            bool flag = True;
+        }
+        case 15: {
+            bool flag1 = True;
+        }
+        case 20: {
+            bool flag10 = True;
+        }
+    };
+    };
+} else {
+    int g = 5;
+    if (g) then {
+        bool flag = True;
+    } else {
+        int h = 5;
+    };
+};

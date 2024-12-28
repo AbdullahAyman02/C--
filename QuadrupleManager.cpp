@@ -59,13 +59,11 @@ vector<string> caseExpression;
 extern "C" {
 
 void addQuadrupleToQuadManager(void *quadManager, const char *op, const char *arg1, const char *arg2, const char *result) {
-    cout << "Push back" << endl;
     QuadrupleManager *quadManagerPtr = (QuadrupleManager *)quadManager;
     quadManagerPtr->addQuadruple(op, arg1, arg2, result);
 }
 
 void addQuadrupleToQuadManagerInFront(void *quadManager, const char *op, const char *arg1, const char *arg2, const char *result) {
-    cout << "Push front" << endl;
     QuadrupleManager *quadManagerPtr = (QuadrupleManager *)quadManager;
     quadManagerPtr->addQuadrupleInFront(Quadruple(op, arg1, arg2, result));
 }
@@ -93,20 +91,17 @@ const char *getExitLabelFromCurrentQuadManager() {
 }
 
 void enterQuadManager() {
-    cout << "Entering quad manager" << endl;
     QuadrupleManager *quadManager = new QuadrupleManager();
     quadrupleManagers.push_back(quadManager);
 }
 
 void *exitQuadManager() {
-    cout << "Exiting quad manager" << endl;
     QuadrupleManager *quadManager = quadrupleManagers.back();
     quadrupleManagers.pop_back();
     return (void *)quadManager;
 }
 
 void addQuadrupleToCurrentQuadManager(const char *op, const char *arg1, const char *arg2, const char *result) {
-    cout << quadrupleManagers.size() << endl;
     quadrupleManagers.back()->addQuadruple(op, arg1, arg2, result);
 }
 
