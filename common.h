@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-// #define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #define debugPrintf(...) printf(__VA_ARGS__)

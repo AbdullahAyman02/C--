@@ -50,7 +50,7 @@
 %right '^'          // right associative token. This means that the token is evaluated from right to left a ^ b ^ c -> a ^ (b ^ c)
 
 %type <type> dataType
-%type <exprValue> expression assignmentValue functionCall falseJMP elseJMP
+%type <exprValue> expression functionCall falseJMP elseJMP
 %type <list> arguments argumentsList parameters parametersList
 
 %%
@@ -114,7 +114,7 @@ statement:
     | FUNCTION_SIGNATURE scope                                          {  debugPrintf("function signature\n"); }
                                                                         //TODO: visibility of variables
     | functionCall                                                      { debugPrintf("function call\n"); }
-    | RETURN assignmentValue                                            { debugPrintf("return\n");}
+    | RETURN expression                                                 { debugPrintf("return\n");}
                                                                         //check return type
     | RETURN                                                            { debugPrintf("return\n");}                                                               
     ;
@@ -166,7 +166,7 @@ declaration:
                                                         void* variable = createVariable($1,$2, yylineno,0);
                                                         addSymbolToSymbolTable(variable);
                                                 }
-    | dataType VARIABLE '=' assignmentValue     { 
+    | dataType VARIABLE '=' expression          { 
                                                         const char* varName = $2;
                                                         const char* assignmentName = $4->name;
                                                         Type varType = $1;
@@ -182,7 +182,7 @@ declaration:
 
                                                         addQuadruple("=", assignmentName, "", varName);
                                                 }
-    | CONST dataType VARIABLE '=' assignmentValue {     
+    | CONST dataType VARIABLE '=' expression {     
                                                         Type varType = $2;
                                                         const char* varName = $3;
                                                         const char* assignmentName = $5->name;
@@ -210,7 +210,7 @@ dataType:
     ;
 
 assignment:
-    VARIABLE '=' assignmentValue        {
+    VARIABLE '=' expression        {
                                             const char* varName = $1;
                                             const char* valName = $3->name;
                                             void* variable = getSymbolFromSymbolTable(varName,yylineno);
@@ -230,53 +230,6 @@ assignment:
                                             
                                         }
                                        
-    ;
-
-assignmentValue:
-    expression                                  { $$ = $1; }
-    | CHARACTER                                 { 
-                                                    const char* val = strdup(&($1));
-                                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
-                                                    
-                                                    returnValue->type = CHAR_T;
-                                                    returnValue->value = (void*)val;
-                                                    returnValue->name = strdup(&($1));
-                                                    $$ = returnValue;
-
-                                                    #ifdef DEBUG
-                                                        debugPrintf("Setting character with value: %c\n", *(char*)($$->value));
-                                                    #endif
-                                                }
-    | CHARARRAY                                 {
-                                                    const char* val = strdup($1);
-                                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
-                                                    
-                                                    returnValue->type = STRING_T;
-                                                    returnValue->value = (void*)val;
-                                                    returnValue->name = val;
-                                                    $$ = returnValue;
-
-                                                    #ifdef DEBUG
-                                                        debugPrintf("Setting string with value: %s\n", (char*)$$->value);
-                                                    #endif
-                                                }
-    | functionCall                              { $$ = $1; }
-    ;
-
-functionCall:
-    VARIABLE '(' parameters ')'     {
-                                        const char* functionName = strdup($1);
-                                        void* function = getSymbolFromSymbolTable(functionName,yylineno);
-                                        void* parametersList = $3;
-                                        checkParamListAgainstFunction(parametersList,function,yylineno);
-                                        ExprValue *returnValue = (ExprValue*)malloc(sizeof(ExprValue));
-                                        
-                                        returnValue->type = getSymbolType(function);
-                                        returnValue->value = (void*)functionName;
-                                        returnValue->name = functionName;   
-
-                                        $$ = returnValue;
-                                    }
     ;
 
 expression:
@@ -321,6 +274,35 @@ expression:
                                     returnValue->name = val;
                                     $$ = returnValue;
                                 }
+    | CHARACTER                 { 
+                                    char* val = malloc(sizeof(char)*2);
+                                    val[0] = $1;
+                                    val[1] = '\0';
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    
+                                    returnValue->type = CHAR_T;
+                                    returnValue->value = val;
+                                    returnValue->name = val;
+                                    $$ = returnValue;
+
+                                    #ifdef DEBUG
+                                        debugPrintf("Setting character with value: %c\n", *(char*)($$->value));
+                                    #endif
+                                }
+    | CHARARRAY                 {
+                                    const char* val = strdup($1);
+                                    ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                    
+                                    returnValue->type = STRING_T;
+                                    returnValue->value = (void*)val;
+                                    returnValue->name = val;
+                                    $$ = returnValue;
+
+                                    #ifdef DEBUG
+                                        debugPrintf("Setting string with value: %s\n", (char*)$$->value);
+                                    #endif
+                                }
+    | functionCall              { $$ = $1; }
     | expression '+' expression {
                                     ExprValue* expr1 = $1;
                                     ExprValue* expr2 = $3;
@@ -670,6 +652,23 @@ expression:
                                     #endif
                                  }
     | '(' expression ')'        { $$ = $2; }
+    
+    ;
+
+functionCall:
+    VARIABLE '(' parameters ')'     {
+                                        const char* functionName = strdup($1);
+                                        void* function = getSymbolFromSymbolTable(functionName,yylineno);
+                                        void* parametersList = $3;
+                                        checkParamListAgainstFunction(parametersList,function,yylineno);
+                                        ExprValue *returnValue = (ExprValue*)malloc(sizeof(ExprValue));
+                                        
+                                        returnValue->type = getSymbolType(function);
+                                        returnValue->value = (void*)functionName;
+                                        returnValue->name = functionName;   
+
+                                        $$ = returnValue;
+                                    }
     ;
 
 arguments:
@@ -700,12 +699,12 @@ parameters:
     ;
 
 parametersList:
-    assignmentValue ',' parametersList      { void* paramList = $3; 
+    expression ',' parametersList           { void* paramList = $3; 
                                                 addTypeToParamList(paramList,$1->type);
                                                 $$ = paramList;
                                             }
 
-    | assignmentValue                   { void* paramList = createParamList(); 
+    | expression                        { void* paramList = createParamList(); 
                                             addTypeToParamList(paramList,$1->type);
                                              $$ = paramList; 
                                         }
@@ -749,7 +748,7 @@ int main(int argc, char **argv) {
     // Call the parser
     yyparse();
     // printSymbolTable();
-    // printSymbolTable();
+    printSymbolTable();
     printQuadruples();
     // Close the input file
     fclose(yyin);
