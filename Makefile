@@ -2,7 +2,7 @@ all: clean flex bison gcc
 
 clean:
 	del /F /Q *.yy.c *.tab.c *.tab.h *.output *.o parser.exe 2>nul || rm -f *.yy.c *.tab.c *.tab.h *.output parser *.o
-	rm nul
+
 flex:
 	flex lexer.l
 

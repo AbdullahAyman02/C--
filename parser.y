@@ -50,7 +50,7 @@
 %right '^'          // right associative token. This means that the token is evaluated from right to left a ^ b ^ c -> a ^ (b ^ c)
 
 %type <type> dataType
-%type <exprValue> expression assignmentValue functionCall
+%type <exprValue> expression assignmentValue functionCall falseJMP elseJMP
 %type <list> arguments argumentsList parameters parametersList
 
 %%
@@ -62,6 +62,39 @@ program:
     | ';' program
     ;
 
+falseJMP:
+    
+    { 
+        printf("falseJMP\n");
+        $$ = $<exprValue>-1;  // Get expression from IF rule
+        // Print the data of the token
+        printf("Name: %s\n", $$->name);
+        printf("Type: %d\n", $$->type);
+        printf("Value: %s\n", convertNumToChar($$->value,$$->type));
+        // Create new label
+        const char* label = newLabel();
+        addQuadruple("ifFalse", $$->name, "", label);
+        $$->name = label;
+    }
+    ;
+
+elseJMP:
+    { 
+        printf("elseJMP\n");
+        $$ = $<exprValue>-2;  // Get expression from IF rule
+        // Print the data of the token
+        printf("Name: %s\n", $$->name);
+        printf("Type: %d\n", $$->type);
+        printf("Value: %s\n", convertNumToChar($$->value,$$->type));
+        // Add the quadruple of the label to the ELSE block
+        const char* label = newLabel();
+        addQuadruple("jmp", "", "", label);
+        addQuadruple($$->name, "", "", "");
+        $$->name = label;
+        // Create new label for ending IF block
+    }
+    ;
+
 statement:
     initialization                                                      { printf("initialization\n");}
     | WHILE '(' expression ')' scope                                    { printf("while\n");}
@@ -69,8 +102,14 @@ statement:
     | FOR '(' initialization ';' expression ';' assignment ')' scope    { printf("for\n");}
     | SWITCH '(' expression ')' '{' case '}'                            { printf("switch\n");}
     | scope                                                             { printf("scope\n");}
-    | IF '(' expression ')' THEN scope                                  { printf("if\n");}
-    | IF '(' expression ')' THEN scope ELSE scope                       { printf("if else\n");}
+    | IF '(' expression ')' falseJMP THEN scope                         { 
+        printf("if\n");
+        addQuadruple($5->name, "", "", "");
+        }
+    | IF '(' expression ')' falseJMP THEN scope elseJMP ELSE scope              {
+        printf("if else\n");
+        addQuadruple($8->name, "", "", "");
+        }
     | FUNCTION dataType VARIABLE '(' arguments ')' scope                { 
                                                                             void* parametersList = $5;
                                                                             void* function = createFunction($2,$3,parametersList,yylineno);
@@ -172,7 +211,7 @@ assignmentValue:
                                                     
                                                     returnValue->type = CHAR_T;
                                                     returnValue->value = (void*)val;
-                                                    returnValue->name = val;
+                                                    returnValue->name = strdup(&($1));
                                                     $$ = returnValue;
 
                                                     #ifdef DEBUG
@@ -678,7 +717,7 @@ int main(int argc, char **argv) {
     // Call the parser
     yyparse();
     // printSymbolTable();
-    printSymbolTable();
+    // printSymbolTable();
     printQuadruples();
     // Close the input file
     fclose(yyin);

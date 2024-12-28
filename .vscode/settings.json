@@ -5,6 +5,15 @@
         "iostream": "cpp",
         "cstring": "cpp",
         "string": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "compare": "cpp",
+        "format": "cpp",
+        "memory": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "xmemory": "cpp",
+        "xtr1common": "cpp",
+        "xutility": "cpp"
     }
 }
