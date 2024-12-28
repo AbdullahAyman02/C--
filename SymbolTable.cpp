@@ -86,11 +86,15 @@ void Function::setIsReturnStatementPresent(bool isReturnStatementPresent) {
     this->isReturnStatementPresent = isReturnStatementPresent;
 }
 
+int SymbolTable::symbolTableIdCnt = 0;
+
 SymbolTable::SymbolTable() {
+    this->id = symbolTableIdCnt++;
 }
 
 SymbolTable::SymbolTable(SymbolTable* parent) {
     this->parent = parent;
+    this->id = symbolTableIdCnt++;
 }
 
 void SymbolTable::insert(Symbol* symbol) {
@@ -119,7 +123,8 @@ SymbolTable* SymbolTable::getParent() {
 }
 
 SymbolTable* SymbolTable::createChild() {
-    return new SymbolTable(this);
+    children.push_back(new SymbolTable(this));
+    return children.back();
 }
 
 void SymbolTable::print() {
@@ -127,7 +132,13 @@ void SymbolTable::print() {
     for (auto it = this->symbols.begin(); it != this->symbols.end(); ++it) {
         it->second->print(vt);
     }
+    cout << "------ Symbol Table " << this->id << " ------" << endl;
     vt.print(cout);
+    cout << endl;
+    for (SymbolTable* child : this->children) {
+        cout << "------ Child of Symbol Table " << this->id << " ------" << endl;
+        child->print();
+    }
 }
 
 static SymbolTable globalSymbolTable;

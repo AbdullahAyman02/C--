@@ -166,7 +166,6 @@ SCOPE_OPEN:
 SCOPE_CLOSE:
     '}'                                         { 
                                                     debugPrintf("Scope Close\n");
-                                                    printSymbolTable();
                                                     exitScope(yylineno);
                                                 }
     ;

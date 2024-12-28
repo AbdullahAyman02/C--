@@ -56,6 +56,10 @@ class SymbolTable {
    private:
     unordered_map<string, Symbol*> symbols;
     SymbolTable* parent;
+    vector<SymbolTable*> children;
+    int id;
+
+    static int symbolTableIdCnt;
 
    public:
     SymbolTable();
