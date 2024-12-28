@@ -681,10 +681,10 @@ arguments:
 
 argumentsList:
     dataType VARIABLE                           {
-                                                    void* paramList = createArgumentList();
+                                                    void* argumentList = createArgumentList();
                                                     void* variable = createVariable($1,$2, yylineno,0);
-                                                    addVariableToArgumentList(paramList,variable);
-                                                    $$ = paramList;
+                                                    addVariableToArgumentList(argumentList,variable);
+                                                    $$ = argumentList;
                                                 }
     | dataType VARIABLE ',' argumentsList       {
                                                     void* variable = createVariable($1,$2, yylineno,0);

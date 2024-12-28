@@ -7,8 +7,10 @@
 
 char c = 'x';
 
-if(c == 'a') then {
+if(2+3) then {
     //
+    int z;
+    z = z+1;
 };
 
 function int power(int base, int exponent) {

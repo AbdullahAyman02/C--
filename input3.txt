@@ -20,7 +20,7 @@ abc(1, 'a', "abc");
 {
     function void wrz(int a, char b, string c) {
         function void xyz1(int aa, char bb, string cc) {
-            a = xyz(1, 0, "abc");
+            a = xyz(1, '0', "abc");
             return;
         };
      return;

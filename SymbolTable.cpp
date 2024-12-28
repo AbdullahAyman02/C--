@@ -21,9 +21,10 @@ string Symbol::getName() {
     return this->name;
 }
 
-Variable::Variable(Type type, string name, int line, bool isConstant, bool isFuncArgument) : Symbol(name, type, line) {
+Variable::Variable(Type type, string name, int line, bool isConstant, bool isFuncArgument, bool isInitialized) : Symbol(name, type, line) {
     this->isConstant = isConstant;
     this->isFuncArg = isFuncArgument;
+    this->isInitialized = isInitialized;
 }
 
 int Symbol::getLine() {
@@ -63,7 +64,7 @@ vector<Variable*>* Function::getArguments() {
 void Function::print(VariadicTable<string, string, string, string>& vt) {
     int argumentCount = this->arguments->size();
     string arguments = "args Cnt = " + to_string(argumentCount);
-    vt.addRow(this->getName(), "func", getTypeName(this->getType()), arguments);
+    vt.addRow(this->getName(), "Func", getTypeName(this->getType()), arguments);
     for (Variable* param : *this->arguments) {
         param->print(vt);
     }
@@ -136,7 +137,8 @@ static void pushFunctionArgumentListIfExistsToScopeSymbolTable() {
     }
     for (auto arg : *functionMetadata.arguments) {
         try {
-            currentSymbolTable->insert(arg);
+            Variable* var = new Variable(arg->getType(), arg->getName(), arg->getLine(), arg->getIsConstant());
+            currentSymbolTable->insert(var);
         } catch (string e) {
             exitOnError(e.c_str(), arg->getLine());
         }
@@ -235,8 +237,9 @@ void checkBothParamsAreBoolean(Type type1, Type type2, int line) {
 
 void useVariableFromSymbolTable(const char* name) {
     Symbol* symbol = currentSymbolTable->lookup(name);
-    if (symbol == nullptr) {
-        throw "Symbol " + string(name) + " not found";
+    Variable* var = dynamic_cast<Variable*>(symbol);
+    if (var == nullptr) {
+        return;
     }
 }
 

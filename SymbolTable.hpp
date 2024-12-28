@@ -27,9 +27,10 @@ class Variable : public Symbol {
    private:
     bool isConstant;
     bool isFuncArg;
+    bool isInitialized = false;
 
    public:
-    Variable(Type type, string name, int line, bool isConstant, bool isFuncArg = false);
+    Variable(Type type, string name, int line, bool isConstant, bool isFuncArg = false, bool isInitialized = false);
     void print(VariadicTable<string, string, string, string>& vt) override;
     bool getIsConstant();
     bool getIsFuncArg();
