@@ -363,35 +363,107 @@ expression:
                                  }
     | expression '||' expression {
                                     checkBothParamsAreBoolean($1->type,$3->type,yylineno);
-                                    // $$ = $1;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) || *(int*)($3->value));
+                                    $$->value = (void*)result;
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple("||", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | expression '&&' expression {
                                     checkBothParamsAreBoolean($1->type,$3->type,yylineno);
-                                    // $$ = $1;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) && *(int*)($3->value));
+                                    $$->value = (void*)result;
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple("&&", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | expression '<' expression  {
                                     checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    // $$ = BOOLEAN_T;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) < *(int*)($3->value));
+                                    $$->value = (void*)result;  
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple("<", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | expression '>' expression {
                                     checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    // $$ = BOOLEAN_T;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) > *(int*)($3->value));
+                                    $$->value = (void*)result;
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple(">", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | expression GE expression  {
                                     checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    // $$ = BOOLEAN_T;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) >= *(int*)($3->value));
+                                    $$->value = (void*)result;
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple(">=", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | expression LE expression    {
                                     checkBothParamsAreNumbers($1->type,$3->type,yylineno);
-                                    // $$ = BOOLEAN_T;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) <= *(int*)($3->value));
+                                    $$->value = (void*)result;
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple("<=", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | expression EQ expression  {
                                     checkBothParamsAreOfSameType($1->type,$3->type,yylineno);
-                                    // $$ = BOOLEAN_T;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) == *(int*)($3->value));
+                                    $$->value = (void*)result;
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple("==", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | expression NE expression  {
                                     checkBothParamsAreOfSameType($1->type,$3->type,yylineno);
-                                    // $$ = BOOLEAN_T;
+                                    $$ = new ExprValue;
+                                    $$->type = BOOLEAN_T;
+                                    int* result = new int(*(int*)($1->value) != *(int*)($3->value));
+                                    $$->value = (void*)result;
+                                    std::string temp = quadManager.newTemp();
+                                    printf("Name of result: %s\n", temp.c_str());
+                                    printf("Name of first: %s\n", $1->name);
+                                    printf("Name of second: %s\n", $3->name);
+                                    quadManager.addQuadruple("!=", std::string($1->name), std::string($3->name), temp);
+                                    $$->name = strdup(temp.c_str());
                                  }
     | '(' expression ')'        { $$ = $2; }
     ;
