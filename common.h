@@ -14,6 +14,14 @@ typedef enum {
     VOID_T
 } Type;
 
+typedef struct {
+    Type type;
+    void* value;
+    const char* name;
+} ExprValue;
+
+const char* exprToString(ExprValue* exprValue);
+
 void enterScope();
 void exitScope();
 void addSymbolToSymbolTable(void* symbol);

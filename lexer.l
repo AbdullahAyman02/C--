@@ -40,7 +40,7 @@
                           return BOOLEAN;
                         }
 
-([-+/*(){}.=;><?:,]|&&|\|\|)   {
+([-+/*(){}\^.=;><?:,]|&&|\|\|)   {
                                 yylval.string = strdup(yytext);
                                 printf("Token: %s\n", yytext);
                                 return *yytext;
