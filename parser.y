@@ -10,6 +10,7 @@
     #define YYDEBUG 1       // for debugging. If set to 1, the parser will print the debugging information
     extern int yydebug;     // for debugging. This variable stores the current debugging level
     #define DEBUG
+    const char* inputFileName;
 %}
 
 // The union is used to define the types of the tokens. Since the datatypes that we will work with are  either int/float, char/string, and boolean, we will use a union to define the types of the tokens   
@@ -148,7 +149,6 @@ statement:
                                                                             void* quadManager = $2;
                                                                             const char* skipFunctionLabel = newLabel();
                                                                             addQuadrupleToCurrentQuadManager("JMP", "", "", skipFunctionLabel);
-                                                                            
                                                                             const char* functionLabel = getFunctionLabel(function);
 
                                                                             addQuadrupleToCurrentQuadManager(functionLabel, "", "", "");
@@ -203,6 +203,9 @@ FUNCTION_SIGNATURE:
                                                             void* parametersList = $5;
                                                             void* function = createFunction(VOID_T,$3,parametersList,yylineno);
                                                             addSymbolToSymbolTable(function);
+                                                            
+                                                            const char* functionLabel = newLabel();
+                                                            setFunctionLabel(function,functionLabel);
 
                                                             $$ = function;
                                                         }
@@ -881,6 +884,7 @@ caseCondition:
 
 void yyerror(char *s) {
     fprintf(stderr, "Error: %s at line %d, near '%s'\n", s, yylineno, yytext);
+    printLogToFile(yytext,yylineno,"syntax");
 }
 
 // pass argument in command line
@@ -895,7 +899,7 @@ int main(int argc, char **argv) {
     }
 
     // Open the input file
-    const char* inputFileName = argv[1];
+    inputFileName = argv[1];
     yyin = fopen(inputFileName, "r");
     if(yyin == NULL) {
         debugPrintf("Error: Unable to open file %s\n", argv[1]);

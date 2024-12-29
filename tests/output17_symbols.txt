@@ -1,0 +1,1250 @@
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+-------------------------------------------------
+|     Name      | Kind |  Type   |     Other    |
+-------------------------------------------------
+| test_function | Func | void    | args Cnt = 3 |
+| a             | Arg  | integer |  -           |
+| b             | Arg  | char    |  -           |
+| c             | Arg  | string  |  -           |
+| w             | Var  | integer |  -           |
+-------------------------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 2 ------
+------ Symbol Table 6 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 7 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| xyz  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| xx   | Var  | integer | Const        |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 0 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| y    | Var  | integer |  -    |
+| g    | Var  | boolean |  -    |
+---------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 0 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| y    | Var  | integer |  -    |
+| g    | Var  | boolean |  -    |
+---------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 0 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| y    | Var  | integer |  -    |
+| g    | Var  | boolean |  -    |
+---------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 2 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 6 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 5 ------
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 1 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 1 ------
+------ Child of Symbol Table 1 ------
+------ Child of Symbol Table 1 ------
+------ Symbol Table 0 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | integer | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+------------------------------
+| Name | Kind | Type | Other |
+------------------------------
+------------------------------
+
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | string  |  -    |
+| b    | Var  | char    |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+---------------------------------
+
+------ Symbol Table 4 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 3 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 0 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| xx   | Var  | integer | Const        |
+| abc  | Func | void    | args Cnt = 3 |
+| a    | Arg  | integer |  -           |
+| b    | Arg  | char    |  -           |
+| c    | Arg  | string  |  -           |
+| y    | Var  | integer |  -           |
+| g    | Var  | boolean |  -           |
+----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
+------ Child of Symbol Table 0 ------
