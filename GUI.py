@@ -1,4 +1,5 @@
 import tkinter as tk
+import customtkinter as ctk
 from tkinter import scrolledtext, font
 from tkinter import ttk, filedialog
 from tkinterdnd2 import DND_FILES, TkinterDnD
@@ -62,14 +63,16 @@ class CompilerGUI:
                                                 selectbackground=self.editor_select_bg_dark, font=custom_font)
         self.output.pack(fill=tk.BOTH, expand=True)
 
-        self.compile_button = tk.Button(root, text="Compile", command=self.compile_code, font=("JetBrains Mono", 12, "bold"),
-                                        bg="blue", fg="white")
-        self.compile_button.grid(row=1, column=1, rowspan=2, padx=5, sticky="n")
+        self.compile_button = ctk.CTkButton(root, text = 'Compile',text_color="#FFFFFF",command=self.compile_code,fg_color="#08b6d9",
+                                            hover_color="#087bb8",width=100,height=25,font=("JetBrains Mono", 12, "bold"), bg_color="transparent")
+        #tk.Button(root, text="Compile", command=self.compile_code, font=("JetBrains Mono", 12, "bold"),
+        #                                bg="blue", fg="white")
+        self.compile_button.grid(row=1, column=1, rowspan=1, padx=5, sticky="n")
 
-        self.compile_button.bind("<Enter>", lambda e: self.on_enter(e, "darkblue"))
-        self.compile_button.bind("<Leave>", lambda e: self.on_leave(e, "blue"))
-        self.compile_button.bind("<ButtonPress>", self.on_press)
-        self.compile_button.bind("<ButtonRelease>", self.on_release)
+        #self.compile_button.bind("<Enter>", lambda e: self.on_enter(e, "darkblue"))
+        #self.compile_button.bind("<Leave>", lambda e: self.on_leave(e, "blue"))
+        #self.compile_button.bind("<ButtonPress>", self.on_press)
+        #self.compile_button.bind("<ButtonRelease>", self.on_release)
 
         original_image = Image.open("Images/dark_mode2.png")
         resized_image = original_image.resize((30, 30), Image.LANCZOS)
@@ -80,8 +83,8 @@ class CompilerGUI:
         self.toggle_theme_button.bind("<Enter>", lambda e: self.on_enter(e, "lightgray"))
         self.toggle_theme_button.bind("<Leave>", lambda e: self.on_leave(e, "white"))
 
-        self.open_file_button = tk.Button(root, text="Open File", command=self.open_file, font=("JetBrains Mono", 12, "bold"),
-                                          bg="green", fg="white")
+        self.open_file_button = ctk.CTkButton(root, text = 'Open File',text_color="#FFFFFF",command=self.open_file,fg_color="#50e650",hover_color="#39a639",width=100,height=25,font=("JetBrains Mono", 12, "bold"), bg_color="transparent")
+
         self.open_file_button.grid(row=2, column=1, padx=5, pady=5, sticky="se")
 
     def compile_code(self):
