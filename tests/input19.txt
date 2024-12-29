@@ -1,0 +1,33 @@
+// To compile and run
+// Run in the terminal the following commands:
+// flex lexer.l
+// bison --yacc -d parser.y
+// gcc .\lex.yy.c .\y.tab.c -o parser
+// .\parser.exe
+
+    function int func(int xx){
+        int x = 5;
+        int z = 99;
+        return 44;
+    };
+
+function int void_function(int a, char b, string c) {
+    int x = 5;
+    int z = 99;
+    int i;
+    for(i = 0; i < 10; i = i + 1) {
+        int xy = 7;
+        int zy = x ^ 3;
+        func(xy);
+    };
+    return 44;
+};
+
+{
+
+    {
+        {
+
+        };
+    };
+};

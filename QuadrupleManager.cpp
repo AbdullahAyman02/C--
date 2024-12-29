@@ -1,15 +1,15 @@
 #include "QuadrupleManager.hpp"
 
 #include <string.h>
-#include <sstream>
+
 #include <fstream>
+#include <sstream>
 
 #include "SymbolTable.hpp"
 #include "Vendor/VariadicTable.h"
 #include "common.h"
 
 void QuadrupleManager::addQuadruple(const string &op, const string &arg1, const string &arg2, const string &result) {
-    printf("Adding quadruple: %s %s %s %s\n", op.c_str(), arg1.c_str(), arg2.c_str(), result.c_str());
     quadruples.emplace_back(op, arg1, arg2, result);
 }
 
@@ -46,7 +46,7 @@ vector<Quadruple> QuadrupleManager::getQuadruples() {
     return this->quadruples;
 }
 
-void QuadrupleManager::printQuadruples(const string& inputFileName) {
+void QuadrupleManager::print(ofstream &outFile) {
     VariadicTable<string, string, string, string, string> vt({"Index", "Op", "Arg1", "Arg2", "Result"});
 
     for (size_t i = 0; i < quadruples.size(); ++i) {
@@ -55,33 +55,9 @@ void QuadrupleManager::printQuadruples(const string& inputFileName) {
 
     std::ostringstream oss;
     vt.print(oss);
-    string output = oss.str();
-    printf("%s", output.c_str());
-    printf("Input file name: %s\n", inputFileName.c_str());
 
-    if (!inputFileName.empty()) {
-        string outputFileName = inputFileName;
-        size_t pos = outputFileName.find("input");
-        if (pos != string::npos) {
-            outputFileName.replace(pos, 5, "output");
-        }
-
-        // Insert "_quadruples" before extension
-        size_t dotPos = outputFileName.find_last_of('.');
-        if (dotPos != string::npos) {
-            outputFileName.insert(dotPos, "_quadruples");
-        }
-
-        printf("Writing quadruples to %s\n", outputFileName.c_str());
-
-        ofstream outFile(outputFileName);
-        if (!outFile) {
-            cerr << "Error: Could not open " << outputFileName << " for writing" << endl;
-            return;
-        }
-        outFile << output;
-        outFile.close();
-    }
+    printf("%s", oss.str().c_str());
+    outFile << oss.str();
 }
 
 int QuadrupleManager::tempCount = 0;
@@ -167,7 +143,8 @@ void handleFunctionQuadruples(void *quadManager, void *function) {
         string argName = arg->getName();
         quadManagerPtr->addQuadrupleInFront("POP", "", "", argName);
     }
-    string returnLabel = "ret_" + func->getLabel() + "_var";
+
+    string returnLabel = "ret_" + func->getLabel();
     quadManagerPtr->addQuadrupleInFront("POP", "", "", returnLabel);
     string returnLabelContent = "content(" + string(returnLabel) + ")";
     quadManagerPtr->addQuadruple("JMP", returnLabelContent, "", "");
@@ -175,7 +152,7 @@ void handleFunctionQuadruples(void *quadManager, void *function) {
 
 void handleFunctionReturnQuadruples() {
     Function *function = FunctionContextSingleton::getCurrentFunction();
-    string returnLabel = "ret_" + function->getLabel() + "_var";
+    string returnLabel = "ret_" + function->getLabel();
     string returnLabelContent = "content(" + string(returnLabel) + ")";
     addQuadrupleToCurrentQuadManager("JMP", returnLabelContent.c_str(), "", "");
 }
@@ -260,77 +237,10 @@ const char *newLabel() {
     return strdup(mainQuadrupleManager.newLabel().c_str());
 }
 
-void printQuadruples(const char* inputFileName) {
-    mainQuadrupleManager.printQuadruples(inputFileName);
-}
-
-static float *castExprToFloat(ExprValue *expr1, ExprValue *expr2, char operation, int line) {
-    float *result = new float();
-
-    switch (operation) {
-        case '+':
-            *result = *(float *)expr1->value + *(float *)expr2->value;
-            break;
-        case '-':
-            *result = *(float *)expr1->value - *(float *)expr2->value;
-            break;
-        case '*':
-            *result = *(float *)expr1->value * *(float *)expr2->value;
-            break;
-        case '/':
-            if (*(float *)expr2->value == 0) {
-                exitOnError("Division by zero", 0);
-            }
-            *result = *(float *)expr1->value / *(float *)expr2->value;
-            break;
-        case '^':
-            *result = 1;
-            for (int i = 0; i < *(int *)expr2->value; i++) {
-                *result *= *(float *)expr1->value;
-            }
-            break;
-    }
-
-    return result;
-}
-
-static int *castExprToInt(ExprValue *expr1, ExprValue *expr2, char operation, int line) {
-    int *result = new int();
-
-    switch (operation) {
-        case '+':
-            *result = *(int *)expr1->value + *(int *)expr2->value;
-            break;
-        case '-':
-            *result = *(int *)expr1->value - *(int *)expr2->value;
-            break;
-        case '*':
-            *result = *(int *)expr1->value * *(int *)expr2->value;
-            break;
-        case '/':
-            if (*(int *)expr2->value == 0) {
-                exitOnError("Division by zero", 0);
-            }
-            *result = *(int *)expr1->value / *(int *)expr2->value;
-            break;
-        case '^':
-            *result = 1;
-            for (int i = 0; i < *(int *)expr2->value; i++) {
-                *result *= *(int *)expr1->value;
-            }
-            break;
-    }
-
-    return result;
-}
-
-void *castExpressions(ExprValue *expr1, ExprValue *expr2, char operation, Type *castedType, int line) {
-    if (expr1->type == FLOAT_T || expr2->type == FLOAT_T) {
-        *castedType = FLOAT_T;
-        return castExprToFloat(expr1, expr2, operation, line);
-    }
-
-    *castedType = INTEGER_T;
-    return castExprToInt(expr1, expr2, operation, line);
+void printQuadruples(const char *inputFileName) {
+    const char *outputFileName = getOutputFileName(inputFileName, "_quadruples.txt");
+    ofstream outFile = ofstream(outputFileName, ios::out);
+    mainQuadrupleManager.print(outFile);
+    outFile.close();
 }
 }

@@ -2,8 +2,9 @@
 
 #include <algorithm>
 #include <cstring>
-#include <sstream>
 #include <fstream>
+#include <sstream>
+#include <unordered_set>
 
 #include "Vendor/VariadicTable.h"
 #include "common.h"
@@ -16,7 +17,7 @@ Symbol::Symbol(string name, Type type, int line) {
 }
 
 void Symbol::print(VariadicTable<string, string, string, string>& vt) {
-    cout << this->getName() << "   " << "Symbol" << "   " << getTypeName(this->getType()) << "   " << " - " << endl;
+    vt.addRow(this->getName(), "Symbol", getTypeName(this->getType()), " - ");
 }
 
 string Symbol::getName() {
@@ -27,7 +28,6 @@ Variable::Variable(Type type, string name, int line, bool isConstant, bool isFun
     this->isConstant = isConstant;
     this->isFuncArg = isFuncArgument;
     this->isInitialized = isInitialized;
-    this->address = addressCnt++;
 }
 
 int Symbol::getLine() {
@@ -36,6 +36,14 @@ int Symbol::getLine() {
 
 Type Symbol::getType() {
     return this->type;
+}
+
+void Symbol::setIsUsed(bool isUsed) {
+    this->isUsed = isUsed;
+}
+
+bool Symbol::getIsUsed() {
+    return this->isUsed;
 }
 
 void Variable::print(VariadicTable<string, string, string, string>& vt) {
@@ -64,11 +72,6 @@ void Variable::setIsFuncArg(bool isFuncArg) {
     this->isFuncArg = isFuncArg;
 }
 
-int Variable::getAddress()
-{
-    return this->address;
-}
-
 Function::Function(string name, Type returnType, vector<Variable*>* arguments, int line) : Symbol(name, returnType, line) {
     this->arguments = arguments;
 }
@@ -79,7 +82,7 @@ vector<Variable*>* Function::getArguments() {
 
 void Function::print(VariadicTable<string, string, string, string>& vt) {
     int argumentCount = this->arguments->size();
-    string arguments = "args Cnt = " + to_string(argumentCount);
+    string arguments = "args cnt = " + to_string(argumentCount);
     vt.addRow(this->getName(), "Func", getTypeName(this->getType()), arguments);
     for (Variable* param : *this->arguments) {
         param->print(vt);
@@ -143,7 +146,7 @@ SymbolTable* SymbolTable::createChild() {
     return children.back();
 }
 
-void SymbolTable::print(const string& inputFileName) {
+void SymbolTable::print(ofstream& outFile) {
     VariadicTable<string, string, string, string> vt({"Name", "Kind", "Type", "Other"});
     for (auto it = this->symbols.begin(); it != this->symbols.end(); ++it) {
         it->second->print(vt);
@@ -151,53 +154,53 @@ void SymbolTable::print(const string& inputFileName) {
 
     std::ostringstream oss;
     oss << "------ Symbol Table " << this->id << " ------\n";
-    vt.print(oss);
+
+    if (!this->isEmpty()) {
+        vt.print(oss);
+    } else {
+        oss << "Empty\n";
+    }
+
     oss << "\n";
 
-    // Print to console
-    printf("%s", oss.str().c_str());
+    string str = oss.str();
+    printf("%s", str.c_str());
+    outFile << str;
 
-    // If filename provided, write to file
-    if (!inputFileName.empty()) {
-        string outputFileName = inputFileName;
-        size_t pos = outputFileName.find("input");
-        if (pos != string::npos) {
-            outputFileName.replace(pos, 5, "output");
-        }
+    for (SymbolTable* child : this->children) {
+        oss.str("");
+        oss << "------ Child of Symbol Table " << this->id << " ------\n";
 
-        // Insert "_symbols" before extension
-        size_t dotPos = outputFileName.find_last_of('.');
-        if (dotPos != string::npos) {
-            outputFileName.insert(dotPos, "_symbols");
-        }
+        string str = oss.str();
+        outFile << str;
+        printf("%s", str.c_str());
 
-        printf("Writing symbol tables to %s\n", outputFileName.c_str());
-
-        ofstream outFile(outputFileName, ios::app);
-        if (!outFile) {
-            cerr << "Error: Could not open " << outputFileName << " for writing" << endl;
-            return;
-        }
-
-        outFile << oss.str();
-
-        // Print child symbol tables
-        for (SymbolTable* child : this->children) {
-            oss.str("");
-            oss.clear();
-            oss << "------ Child of Symbol Table " << this->id << " ------\n";
-            child->print(inputFileName);
-            outFile << oss.str();
-        }
-
-        outFile.close();
+        child->print(outFile);
     }
+}
+
+bool SymbolTable::isEmpty() {
+    return this->symbols.empty();
+}
+
+vector<Symbol*> SymbolTable::getUnusedSymbols() {
+    vector<Symbol*> unusedSymbols;
+    for (auto it = this->symbols.begin(); it != this->symbols.end(); ++it) {
+        Symbol* symbol = it->second;
+        if (!symbol->getIsUsed()) {
+            unusedSymbols.push_back(symbol);
+        }
+    }
+    for (SymbolTable* child : this->children) {
+        vector<Symbol*> childUnusedSymbols = child->getUnusedSymbols();
+        unusedSymbols.insert(unusedSymbols.end(), childUnusedSymbols.begin(), childUnusedSymbols.end());
+    }
+    return unusedSymbols;
 }
 
 static SymbolTable globalSymbolTable;
 static SymbolTable* currentSymbolTable = &globalSymbolTable;
 static string getTypeName(Type type);
-int Variable::addressCnt = 0;
 
 struct SwitchCaseMetadata {
     Type type;
@@ -318,6 +321,7 @@ void* getSymbolFromSymbolTable(const char* name, int line) {
         string message = "Symbol " + string(name) + " not found";
         exitOnError(message.c_str(), line);
     }
+    symbol->setIsUsed(true);
     return (void*)symbol;
 }
 
@@ -338,12 +342,6 @@ void* getVariableFromSymbolTable(const char* name, int line) {
         exitOnError(message.c_str(), line);
     }
     return (void*)var;
-}
-
-const char* getVariableAddress(void* symbol) {
-    Variable* var = (Variable*)symbol;
-    string address = "R" +to_string(var->getAddress());
-    return strdup(address.c_str());
 }
 
 void checkVariableIsNotConstant(void* symbol, int line) {
@@ -381,6 +379,7 @@ void checkBothParamsAreBoolean(Type type1, Type type2, int line) {
 void checkBothParamsAreOfSameType(Type type1, Type type2, int line) {
     if (type1 != type2) {
         string message = "Parameters are not of the same type ";
+        message += "Type mismatch: ";
         message += "First parameter is of type " + getTypeName(type1) + " ,";
         message += "Second parameter is of type " + getTypeName(type2);
         exitOnError(message.c_str(), line);
@@ -395,7 +394,46 @@ void checkParamIsNumber(Type type, int line) {
 }
 
 void printSymbolTable(const char* inputFileName) {
-    currentSymbolTable->print(inputFileName);
+    const char* outputFileName = getOutputFileName(inputFileName, "_symbol_table.txt");
+    ofstream outFile = ofstream(outputFileName, ios::out);
+    currentSymbolTable->print(outFile);
+    outFile.close();
+}
+
+void printUnusedSymbols(const char* inputFileName) {
+    vector<Symbol*> unusedSymbols = currentSymbolTable->getUnusedSymbols();
+
+    sort(unusedSymbols.begin(), unusedSymbols.end(), [](Symbol* a, Symbol* b) {
+        return a->getLine() < b->getLine();
+    });
+
+    if (unusedSymbols.empty()) {
+        return;
+    }
+
+    const char* outputFileName = getOutputFileName(inputFileName, "_error.txt");
+    ofstream outFile = ofstream(outputFileName, ios::app);
+    ostringstream oss;
+
+    for (Symbol* symbol : unusedSymbols) {
+        Variable* var = dynamic_cast<Variable*>(symbol);
+        string symbolTypeName;
+
+        if (var == nullptr) {
+            symbolTypeName = "Function";
+        } else {
+            symbolTypeName = "Variable";
+        }
+
+        string message = "Warning: " + symbolTypeName + " " + symbol->getName() + " declared in line " + to_string(symbol->getLine());
+        message += " is not used";
+        oss << message << endl;
+    }
+
+    printf("%s", oss.str().c_str());
+    outFile << oss.str();
+
+    outFile.close();
 }
 
 Type getSymbolType(void* symbol) {
