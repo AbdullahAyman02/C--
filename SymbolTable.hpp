@@ -28,8 +28,7 @@ class Variable : public Symbol {
     bool isConstant;
     bool isFuncArg;
     bool isInitialized = false;
-    int address;
-    static int addressCnt;
+
    public:
     Variable(Type type, string name, int line, bool isConstant, bool isFuncArg = false, bool isInitialized = false);
     void print(VariadicTable<string, string, string, string>& vt) override;
@@ -38,7 +37,6 @@ class Variable : public Symbol {
     bool getIsInitialized();
     void setIsInitialized(bool isInitialized);
     void setIsFuncArg(bool isFuncArg);
-    int getAddress();
 };
 
 class Function : public Symbol {
