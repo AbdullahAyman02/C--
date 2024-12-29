@@ -1,0 +1,40 @@
+
+int i = 9;
+int var;
+
+//COMBO EXPRESSION TEST
+if((i>8 && i < 9) || (i!=8 && i <= 9) && i == 9)then{
+    var=12;
+};
+
+char co = 'a';
+float j;
+
+switch(co){ 
+    case 'b':{ 
+        j = 9.0; 
+    }
+    case 'p':{ 
+        j = 9.0; 
+    }
+    case 's':{ 
+        j = 9.0; 
+    }
+};
+
+//COMBO EXPRESSION TEST
+int k = 0;
+for (k = 0; k < 20; k = k + 1)
+{
+    for (i = 0; i < 20; i = i + 1)
+    {
+        switch(co){ 
+        case 'b':{ 
+            j = 9.0; 
+        }
+        case 'p':{ 
+            j = 9.0; 
+        }
+        };
+    };
+};

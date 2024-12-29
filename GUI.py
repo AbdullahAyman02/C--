@@ -43,7 +43,7 @@ class CompilerGUI:
         self.root_bg_light = "#fefefe"
 
         # Define a custom font
-        custom_font = font.Font(family="JetBrains Mono", size=11)
+        custom_font = font.Font(family="JetBrains Mono", size=12)
 
         self.editor = scrolledtext.ScrolledText(root, wrap=tk.WORD, width=70, height=25, undo=True,
                                                 bg=self.editor_bg_dark, fg=self.editor_fg_dark, insertbackground=self.editor_insert_bg_dark,
@@ -65,7 +65,7 @@ class CompilerGUI:
         self.output.pack(fill=tk.BOTH, expand=True)
 
         self.compile_button = ctk.CTkButton(root, text='Compile', text_color="#FFFFFF", command=self.compile_code, fg_color="#08b6d9",
-                                            hover_color="#087bb8", width=100, height=25, font=("JetBrains Mono", 12, "bold"), bg_color="transparent")
+                                            hover_color="#087bb8", width=100, height=35, font=("JetBrains Mono", 16, "bold"), bg_color="transparent")
         # tk.Button(root, text="Compile", command=self.compile_code, font=("JetBrains Mono", 12, "bold"),
         #                                bg="blue", fg="white")
         self.compile_button.grid(
@@ -90,7 +90,7 @@ class CompilerGUI:
             "<Leave>", lambda e: self.on_leave(e, "white"))
 
         self.open_file_button = ctk.CTkButton(root, text='Open File', text_color="#FFFFFF", command=self.open_file, fg_color="#50e650",
-                                              hover_color="#39a639", width=100, height=25, font=("JetBrains Mono", 12, "bold"), bg_color="transparent")
+                                              hover_color="#39a639", width=100, height=35, font=("JetBrains Mono", 16, "bold"), bg_color="transparent")
 
         self.open_file_button.grid(
             row=2, column=1, padx=5, pady=5, sticky="se")

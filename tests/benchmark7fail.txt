@@ -1,0 +1,44 @@
+/*
+======================================== CONDITIONAL EXPRESSIONS ================================================
+*/
+int x = 10;
+int test;
+
+if (x == 10)
+{
+    test = 10;
+}
+else if (x == 5)
+{
+    test = 5;
+}
+else
+{
+    test = x;
+}
+
+//COMBO CONDITIONAL EXPRESSION TEST
+if (x == 10)
+{
+    test = 10;
+    if(x == 10 && booleanFunc() || !booleanFunc())
+    {
+        test = 10;
+        for (int i = 0; i < 10; i = i+1)
+        {
+            int b = 10;
+        }
+    }
+    else
+    {
+        test = 20;
+    }
+}
+else if (x == 5)
+{
+    test = 5;
+}
+else
+{
+    test = x;
+}

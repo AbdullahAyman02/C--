@@ -1,0 +1,41 @@
+/*
+    ======================================== FUNCTIONS ================================================
+*/
+
+function int sum(int x, int y)
+{
+  return x + y;
+};
+
+function void fun(int x){
+    int res;
+    if (x>7) then
+    {
+        res = 7;
+    }
+    else{
+        res = 10;
+    };
+};
+
+function void Fn1(int x){
+    int res;
+    function void Fn2(){
+        string text ;
+        int i;
+        for (i = 0; i < 10; i = i+1)
+        {
+            text = "breaker";
+        };
+        function void Fn3(){
+            if (x>7) then
+            {
+                res = 7;
+            }
+            else{
+                res = 10;
+            };
+        };
+    };
+};
+
