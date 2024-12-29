@@ -50,8 +50,8 @@
 %right '^'          // right associative token. This means that the token is evaluated from right to left a ^ b ^ c -> a ^ (b ^ c)
 
 %type <type> dataType 
-%type <exprValue> expression functionCall  caseCondition CASE_EXPRESSION
-%type <list> arguments argumentsList parameters parametersList case SCOPE_CLOSE scope FUNCTION_SIGNATURE
+%type <exprValue> expression functionCall  caseCondition CASE_EXPRESSION BOOLEAN_EXPRESSION
+%type <list> arguments argumentsList parameters parametersList case SCOPE_CLOSE scope FUNCTION_SIGNATURE CLOSE_QUAD_MANAGER
 
 %%
 // The grammar rules are defined here. The grammar rules define the structure of the language. They define how the tokens are combined to form statements, expressions, etc.
@@ -64,9 +64,17 @@ program:
 
 statement:
     initialization                                                      { debugPrintf("initialization\n");}
-    | WHILE '(' expression ')' scope                                    { debugPrintf("while\n");}
-    | REPEAT scope UNTIL '(' expression ')'                             { debugPrintf("repeat\n");}
-    | FOR '(' forLoopInitialization ';' expression ';' assignment ')' scope    { debugPrintf("for\n");}
+    | WHILE '(' BOOLEAN_EXPRESSION ')' scope                                    { debugPrintf("while\n");}
+    | REPEAT scope UNTIL '(' BOOLEAN_EXPRESSION ')'                             { debugPrintf("repeat\n");}
+    | FOR '(' forLoopInitialization ';'OPEN_QUAD_MANAGER BOOLEAN_EXPRESSION CLOSE_QUAD_MANAGER ';' OPEN_QUAD_MANAGER assignment CLOSE_QUAD_MANAGER ')' scope
+                                                                                                { 
+                                                                                                    ExprValue* booleanExpr = $6;
+                                                                                                    const char* booleanExprName = booleanExpr->name;
+                                                                                                    void* booleanExprQuadManager = $7;
+                                                                                                    void* assignmentQuadManager = $11;
+                                                                                                    void* scopeQuadManager = $13;
+                                                                                                    handleForLoopQuadruples(booleanExprName,booleanExprQuadManager,assignmentQuadManager,scopeQuadManager);
+                                                                                                }
     | SWITCH '(' CASE_EXPRESSION ')' '{' case '}'                            { 
                                                                             void* switchCaseList = $6;
                                                                             ExprValue* switchExpression = $3;
@@ -147,6 +155,12 @@ statement:
                                                                         }                                                               
     ;
 
+OPEN_QUAD_MANAGER:
+     /* NULL */                                { enterQuadManager(); }
+    ;
+CLOSE_QUAD_MANAGER:
+     /* NULL */                                { $$ = exitQuadManager(); }
+    ;
 CASE_EXPRESSION:
     expression                                          { 
                                                             $$ = $1;
@@ -503,7 +517,11 @@ expression:
                                         debugPrintf("Value of result: %s\n", convertNumToChar($$->value,$$->type));
                                     #endif
                                  }
-    | expression '||' expression {
+    | '(' expression ')'        { $$ = $2; }
+    | BOOLEAN_EXPRESSION        { $$ = $1; }
+
+BOOLEAN_EXPRESSION:
+                        expression '||' expression {
                                     Type expr1Type = $1->type;
                                     Type expr2Type = $3->type;
                                     const char* tempVar = newTemp();
@@ -701,7 +719,7 @@ expression:
                                         debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
                                     #endif
                                  }
-    | '(' expression ')'        { $$ = $2; }
+    
     
     ;
 

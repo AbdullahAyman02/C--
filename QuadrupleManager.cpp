@@ -171,6 +171,22 @@ void handleFunctionCallQuadruples(void *function, void *paramList, const char *r
     }
 }
 
+void handleForLoopQuadruples(const char *booleanExprVar, void *booleanExprQuadManager, void *assignmentQuadManager, void *scopeQuadManager) {
+    QuadrupleManager *booleanExprQuadManagerPtr = (QuadrupleManager *)booleanExprQuadManager;
+    QuadrupleManager *assignmentQuadManagerPtr = (QuadrupleManager *)assignmentQuadManager;
+    QuadrupleManager *scopeQuadManagerPtr = (QuadrupleManager *)scopeQuadManager;
+
+    string forLabel = newLabel();
+    string endForLabel = newLabel();
+    addQuadrupleToCurrentQuadManager(forLabel.c_str(), "", "", "");
+    mergeQuadManagerToCurrentQuadManager(booleanExprQuadManagerPtr);
+    addQuadrupleToCurrentQuadManager("JF", booleanExprVar, "", endForLabel.c_str());
+    mergeQuadManagerToCurrentQuadManager(scopeQuadManagerPtr);
+    mergeQuadManagerToCurrentQuadManager(assignmentQuadManagerPtr);
+    addQuadrupleToCurrentQuadManager("JMP", forLabel.c_str(), "", "");
+    addQuadrupleToCurrentQuadManager(endForLabel.c_str(), "", "", "");
+}
+
 void addQuadruple(const char *op, const char *arg1, const char *arg2, const char *result) {
     mainQuadrupleManager.addQuadruple(op, arg1, arg2, result);
 }
