@@ -3,7 +3,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-
 #endif
 
 // #define DEBUG
@@ -44,7 +43,6 @@ void checkBothParamsAreOfSameType(Type type1, Type type2, int line);
 void printSymbolTable(const char* inputFileName);
 Type getSymbolType(void* symbol);
 void exitOnError(const char* message, int line);
-void printLogToFile(const char* message, int line, const char* errorType);
 void* createArgumentList();
 void addVariableToArgumentList(void* argumentList, void* variable);
 void* createFunction(Type returnType, const char* name, void* argumentList, int line);
@@ -55,7 +53,7 @@ void checkVariableIsNotConstant(void* symbol, int line);
 void* getVariableFromSymbolTable(const char* name, int line);
 void setVariableAsInitialized(void* symbol);
 void checkReturnStatementIsValid(Type returnType, int line);
-
+void printLogToFile(const char* message, int line, const char* errorType);
 void* createSwitchCaseList();
 void addCaseToSwitchCaseList(void* switchCaseList, Type type, int line);
 void checkSwitchCaseListAgainstType(void* switchCaseList, Type type);
@@ -64,6 +62,9 @@ void addQuadruple(const char* op, const char* arg1, const char* arg2, const char
 const char* newTemp();
 const char* newLabel();
 void printQuadruples(const char* inputFileName);
+const char* allocMap(const char* var);
+const char* getRegister(const char* var);
+const char* getVariableAddress(void* symbol);
 
 void enterQuadManager();
 void* exitQuadManager();
@@ -93,8 +94,6 @@ void handleForLoopQuadruples(const char* booleanExprVar, void* booleanExprQuadMa
 void handleRepeatUntilQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
 void handleWhileQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
 void* castExpressions(ExprValue* expr1, ExprValue* expr2, char operation, Type* castedType, int line);
-
-
 #ifdef __cplusplus
 }
 #endif

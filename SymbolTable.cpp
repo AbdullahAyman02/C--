@@ -27,6 +27,7 @@ Variable::Variable(Type type, string name, int line, bool isConstant, bool isFun
     this->isConstant = isConstant;
     this->isFuncArg = isFuncArgument;
     this->isInitialized = isInitialized;
+    this->address = addressCnt++;
 }
 
 int Symbol::getLine() {
@@ -61,6 +62,11 @@ void Variable::setIsInitialized(bool isInitialized) {
 
 void Variable::setIsFuncArg(bool isFuncArg) {
     this->isFuncArg = isFuncArg;
+}
+
+int Variable::getAddress()
+{
+    return this->address;
 }
 
 Function::Function(string name, Type returnType, vector<Variable*>* arguments, int line) : Symbol(name, returnType, line) {
@@ -191,6 +197,7 @@ void SymbolTable::print(const string& inputFileName) {
 static SymbolTable globalSymbolTable;
 static SymbolTable* currentSymbolTable = &globalSymbolTable;
 static string getTypeName(Type type);
+int Variable::addressCnt = 0;
 
 struct SwitchCaseMetadata {
     Type type;
@@ -331,6 +338,12 @@ void* getVariableFromSymbolTable(const char* name, int line) {
         exitOnError(message.c_str(), line);
     }
     return (void*)var;
+}
+
+const char* getVariableAddress(void* symbol) {
+    Variable* var = (Variable*)symbol;
+    string address = "R" +to_string(var->getAddress());
+    return strdup(address.c_str());
 }
 
 void checkVariableIsNotConstant(void* symbol, int line) {

@@ -11,6 +11,7 @@
     extern int yydebug;     // for debugging. This variable stores the current debugging level
     #define DEBUG
     const char* inputFileName;
+
 %}
 
 // The union is used to define the types of the tokens. Since the datatypes that we will work with are  either int/float, char/string, and boolean, we will use a union to define the types of the tokens   
@@ -149,6 +150,7 @@ statement:
                                                                             void* quadManager = $2;
                                                                             const char* skipFunctionLabel = newLabel();
                                                                             addQuadrupleToCurrentQuadManager("JMP", "", "", skipFunctionLabel);
+                                                                            
                                                                             const char* functionLabel = getFunctionLabel(function);
 
                                                                             addQuadrupleToCurrentQuadManager(functionLabel, "", "", "");
@@ -203,9 +205,6 @@ FUNCTION_SIGNATURE:
                                                             void* parametersList = $5;
                                                             void* function = createFunction(VOID_T,$3,parametersList,yylineno);
                                                             addSymbolToSymbolTable(function);
-                                                            
-                                                            const char* functionLabel = newLabel();
-                                                            setFunctionLabel(function,functionLabel);
 
                                                             $$ = function;
                                                         }
@@ -244,8 +243,11 @@ SCOPE_CLOSE:
 
 declaration:
     dataType VARIABLE                           {      
+                                                        const char* varName = $2;
                                                         void* variable = createVariable($1,$2, yylineno,0);
+                                                        const char* varRegister = getVariableAddress(variable);
                                                         addSymbolToSymbolTable(variable);
+                                                        addQuadrupleToCurrentQuadManager("ALLOC", varName, "", varRegister);
                                                 }
     | dataType VARIABLE '=' expression          { 
                                                         const char* varName = $2;
@@ -261,7 +263,8 @@ declaration:
                                                         #ifdef DEBUG
                                                             debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         #endif
-
+                                                        const char* varRegister = getVariableAddress(variable);
+                                                        addQuadrupleToCurrentQuadManager("ALLOC", varName, "", varRegister);
                                                         addQuadrupleToCurrentQuadManager("ASSIGN", assignmentName, "", varName);
                                                 }
     | CONST dataType VARIABLE '=' expression {     
@@ -279,8 +282,8 @@ declaration:
                                                         #ifdef DEBUG
                                                             debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         #endif
-                                                       
-                                                        
+                                                        const char* varRegister = getVariableAddress(variable);
+                                                        addQuadrupleToCurrentQuadManager("ALLOC", varName, "", varRegister);                                                       
                                                         addQuadrupleToCurrentQuadManager("ASSIGN", assignmentName, "", varName);
                                                   }
     ;
@@ -884,7 +887,6 @@ caseCondition:
 
 void yyerror(char *s) {
     fprintf(stderr, "Error: %s at line %d, near '%s'\n", s, yylineno, yytext);
-    printLogToFile(yytext,yylineno,"syntax");
 }
 
 // pass argument in command line
@@ -899,7 +901,7 @@ int main(int argc, char **argv) {
     }
 
     // Open the input file
-    inputFileName = argv[1];
+    const char* inputFileName = argv[1];
     yyin = fopen(inputFileName, "r");
     if(yyin == NULL) {
         debugPrintf("Error: Unable to open file %s\n", argv[1]);
