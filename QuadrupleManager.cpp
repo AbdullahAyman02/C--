@@ -45,6 +45,21 @@ vector<Quadruple> QuadrupleManager::getQuadruples() {
     return this->quadruples;
 }
 
+string QuadrupleManager::allocMap(string var)
+{
+    if (registerMap.find(var) != registerMap.end()) {
+        return registerMap[var];
+    } else {
+        string newReg = "R" + std::to_string(registerCount++);
+        registerMap[var] = newReg;
+        return newReg;
+    }
+}
+string QuadrupleManager::getRegister(string var)
+{
+    return registerMap[var];
+}
+
 void QuadrupleManager::printQuadruples(const string& inputFileName) {
     VariadicTable<string, string, string, string, string> vt({"Index", "Op", "Arg1", "Arg2", "Result"});
 
@@ -85,6 +100,8 @@ void QuadrupleManager::printQuadruples(const string& inputFileName) {
 
 int QuadrupleManager::tempCount = 0;
 int QuadrupleManager::labelCount = 0;
+int QuadrupleManager::registerCount = 0;
+map<string, string> QuadrupleManager::registerMap;
 
 static QuadrupleManager mainQuadrupleManager;
 
@@ -262,6 +279,16 @@ const char *newLabel() {
 void printQuadruples(const char* inputFileName) {
     mainQuadrupleManager.printQuadruples(inputFileName);
 }
+const char* allocMap(const char *var)
+{
+    return strdup(mainQuadrupleManager.allocMap(var).c_str());
+
+}
+const char* getRegister(const char *var)
+{
+    return strdup(mainQuadrupleManager.getRegister(var).c_str());
+}
+
 
 static float *castExprToFloat(ExprValue *expr1, ExprValue *expr2, char operation, int line) {
     float *result = new float();

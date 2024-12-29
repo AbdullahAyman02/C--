@@ -1,5 +1,5 @@
 #pragma once
-
+#include <map>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -15,6 +15,8 @@ class QuadrupleManager {
 
     static int tempCount;   // Counter for temporary variables
     static int labelCount;  // Counter for labels
+    static int registerCount;
+    static map<string, string> registerMap;
    public:
     // Add a new quadruple
     void addQuadruple(const string& op, const string& arg1, const string& arg2, const string& result);
@@ -34,6 +36,9 @@ class QuadrupleManager {
 
     vector<Quadruple> getQuadruples();
 
+    // alloc map
+    string allocMap(string var);
+    string getRegister(string var);
     // Display all quadruples
     void printQuadruples(const string& inputFileName = "");
 };

@@ -243,6 +243,9 @@ declaration:
     dataType VARIABLE                           {      
                                                         void* variable = createVariable($1,$2, yylineno,0);
                                                         addSymbolToSymbolTable(variable);
+                                                        const char* varName = $2;
+                                                        const char* varRegister = allocMap(varName);
+                                                        addQuadrupleToCurrentQuadManager("ALLOC", varName, "", varRegister);
                                                 }
     | dataType VARIABLE '=' expression          { 
                                                         const char* varName = $2;

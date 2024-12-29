@@ -62,6 +62,8 @@ void addQuadruple(const char* op, const char* arg1, const char* arg2, const char
 const char* newTemp();
 const char* newLabel();
 void printQuadruples(const char* inputFileName);
+const char* allocMap(const char* var);
+const char* getRegister(const char* var);
 
 void enterQuadManager();
 void* exitQuadManager();
