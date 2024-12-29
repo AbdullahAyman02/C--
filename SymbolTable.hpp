@@ -71,7 +71,7 @@ class SymbolTable {
     Symbol* lookup(string name);
     SymbolTable* getParent();
     SymbolTable* createChild();
-    void print();
+    void print(const string& inputFileName = "");
 };
 
 struct FunctionMetadata {

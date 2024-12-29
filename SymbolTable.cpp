@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <cstring>
+#include <sstream>
+#include <fstream>
 
 #include "Vendor/VariadicTable.h"
 #include "common.h"
@@ -135,17 +137,54 @@ SymbolTable* SymbolTable::createChild() {
     return children.back();
 }
 
-void SymbolTable::print() {
+void SymbolTable::print(const string& inputFileName) {
     VariadicTable<string, string, string, string> vt({"Name", "Kind", "Type", "Other"});
     for (auto it = this->symbols.begin(); it != this->symbols.end(); ++it) {
         it->second->print(vt);
     }
-    cout << "------ Symbol Table " << this->id << " ------" << endl;
-    vt.print(cout);
-    cout << endl;
-    for (SymbolTable* child : this->children) {
-        cout << "------ Child of Symbol Table " << this->id << " ------" << endl;
-        child->print();
+
+    std::ostringstream oss;
+    oss << "------ Symbol Table " << this->id << " ------\n";
+    vt.print(oss);
+    oss << "\n";
+
+    // Print to console
+    printf("%s", oss.str().c_str());
+
+    // If filename provided, write to file
+    if (!inputFileName.empty()) {
+        string outputFileName = inputFileName;
+        size_t pos = outputFileName.find("input");
+        if (pos != string::npos) {
+            outputFileName.replace(pos, 5, "output");
+        }
+
+        // Insert "_symbols" before extension
+        size_t dotPos = outputFileName.find_last_of('.');
+        if (dotPos != string::npos) {
+            outputFileName.insert(dotPos, "_symbols");
+        }
+
+        printf("Writing symbol tables to %s\n", outputFileName.c_str());
+
+        ofstream outFile(outputFileName, ios::app);
+        if (!outFile) {
+            cerr << "Error: Could not open " << outputFileName << " for writing" << endl;
+            return;
+        }
+
+        outFile << oss.str();
+
+        // Print child symbol tables
+        for (SymbolTable* child : this->children) {
+            oss.str("");
+            oss.clear();
+            oss << "------ Child of Symbol Table " << this->id << " ------\n";
+            child->print(inputFileName);
+            outFile << oss.str();
+        }
+
+        outFile.close();
     }
 }
 
@@ -342,8 +381,8 @@ void checkParamIsNumber(Type type, int line) {
     }
 }
 
-void printSymbolTable() {
-    currentSymbolTable->print();
+void printSymbolTable(const char* inputFileName) {
+    currentSymbolTable->print(inputFileName);
 }
 
 Type getSymbolType(void* symbol) {

@@ -1,6 +1,8 @@
 #include "QuadrupleManager.hpp"
 
 #include <string.h>
+#include <sstream>
+#include <fstream>
 
 #include "SymbolTable.hpp"
 #include "Vendor/VariadicTable.h"
@@ -43,14 +45,42 @@ vector<Quadruple> QuadrupleManager::getQuadruples() {
     return this->quadruples;
 }
 
-void QuadrupleManager::printQuadruples() {
+void QuadrupleManager::printQuadruples(const string& inputFileName) {
     VariadicTable<string, string, string, string, string> vt({"Index", "Op", "Arg1", "Arg2", "Result"});
 
     for (size_t i = 0; i < quadruples.size(); ++i) {
         quadruples[i].display(i, vt);
     }
 
-    vt.print(cout);
+    std::ostringstream oss;
+    vt.print(oss);
+    string output = oss.str();
+    printf("%s", output.c_str());
+    printf("Input file name: %s\n", inputFileName.c_str());
+
+    if (!inputFileName.empty()) {
+        string outputFileName = inputFileName;
+        size_t pos = outputFileName.find("input");
+        if (pos != string::npos) {
+            outputFileName.replace(pos, 5, "output");
+        }
+
+        // Insert "_quadruples" before extension
+        size_t dotPos = outputFileName.find_last_of('.');
+        if (dotPos != string::npos) {
+            outputFileName.insert(dotPos, "_quadruples");
+        }
+
+        printf("Writing quadruples to %s\n", outputFileName.c_str());
+
+        ofstream outFile(outputFileName);
+        if (!outFile) {
+            cerr << "Error: Could not open " << outputFileName << " for writing" << endl;
+            return;
+        }
+        outFile << output;
+        outFile.close();
+    }
 }
 
 int QuadrupleManager::tempCount = 0;
@@ -229,8 +259,8 @@ const char *newLabel() {
     return strdup(mainQuadrupleManager.newLabel().c_str());
 }
 
-void printQuadruples() {
-    mainQuadrupleManager.printQuadruples();
+void printQuadruples(const char* inputFileName) {
+    mainQuadrupleManager.printQuadruples(inputFileName);
 }
 
 static float *castExprToFloat(ExprValue *expr1, ExprValue *expr2, char operation, int line) {

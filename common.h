@@ -40,7 +40,7 @@ void checkBothParamsAreNumbers(Type type1, Type type2, int line);
 void checkBothParamsAreBoolean(Type type1, Type type2, int line);
 void checkParamIsNumber(Type type, int line);
 void checkBothParamsAreOfSameType(Type type1, Type type2, int line);
-void printSymbolTable();
+void printSymbolTable(const char* inputFileName);
 Type getSymbolType(void* symbol);
 void exitOnError(const char* message, int line);
 void* createArgumentList();
@@ -61,7 +61,7 @@ void checkSwitchCaseListAgainstType(void* switchCaseList, Type type);
 void addQuadruple(const char* op, const char* arg1, const char* arg2, const char* result);
 const char* newTemp();
 const char* newLabel();
-void printQuadruples();
+void printQuadruples(const char* inputFileName);
 
 void enterQuadManager();
 void* exitQuadManager();

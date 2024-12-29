@@ -35,5 +35,5 @@ class QuadrupleManager {
     vector<Quadruple> getQuadruples();
 
     // Display all quadruples
-    void printQuadruples();
+    void printQuadruples(const string& inputFileName = "");
 };

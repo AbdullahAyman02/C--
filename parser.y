@@ -899,8 +899,9 @@ int main(int argc, char **argv) {
     
     // Call the parser
     yyparse();
-    printSymbolTable();
-    printQuadruples();
+    printf("Input file: %s\n", inputFileName);
+    printQuadruples(inputFileName);
+    printSymbolTable(inputFileName);
 
     // Close the input file
     fclose(yyin);
