@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 import subprocess
 import threading
 import time
+import os
 
 temp_path = "temp/temp_input.txt"
 
@@ -86,9 +87,14 @@ class CompilerGUI:
     def compile_code(self):
         code = self.editor.get("1.0", tk.END)
 
+        # Ensure the temp directory exists
+        os.makedirs(os.path.dirname(temp_path), exist_ok=True)
+
+        # Save the code to a temporary file
         with open(temp_path, "w") as file:
             file.write(code)
 
+        # Run the compiler in a separate thread to avoid blocking the GUI
         threading.Thread(target=self.run_compiler).start()
 
     def run_compiler(self):
@@ -97,6 +103,7 @@ class CompilerGUI:
         self.output.config(state='normal')
         self.output.delete("1.0", tk.END)
 
+        # Read the output in real-time
         for line in iter(process.stdout.readline, ''):
             self.output.insert(tk.END, line)
             self.output.see(tk.END)
