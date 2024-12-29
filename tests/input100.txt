@@ -1,0 +1,75 @@
+{
+int x = 2;
+int y = 3;
+int z = 4;
+int w = 5;
+if (x < y) then {
+   for (x = 0; x < 10; x = x + 1) {
+       y = y + 1;
+       while (y < 10) {
+           y = y + 1;
+           switch (y) {
+               case 1: {
+                   y = y + 1;
+                   if (y < 10) then {
+                       y = y + 1;
+                   }
+                   else {
+                       y = y + 2;
+                       for (z = 0; z < 10; z = z + 1) {
+                           z = z + 1;
+                           while (z < 10) {
+                               z = z + 1;
+                               switch (z) {
+                                   case 1: {
+                                       z = z + 1;
+                                   }
+                                   case 2: {
+                                       z = z + 2;
+                                   }
+                                   case 3: {
+                                       z = z + 3;
+                                   }              
+                               };
+                           };
+                       };
+                   };
+               }
+               case 2: {
+                   y = y + 2;
+               }
+               case 3: {
+                   y = y + 3;
+                   if   (y < 10) then {
+                       y = y + 1;
+                   }
+                   else {
+                       y = y + 2;
+                       for (z = 0; z < 10; z = z + 1) {
+                           z = z + 1;
+                           while (z < 10) {
+                               z = z + 1;
+                               switch (z) {
+                                   case 1: {
+                                       z = z + 1;
+                                   }
+                                   case 2: {
+                                       z = z + 2;
+                                   }
+                                   case 3: {
+                                       z = z + 3;
+                                   }          
+                               };
+                           };
+                       };
+                   };
+               }              
+           };
+       };
+    };
+}
+else {
+    y = x;
+};
+
+};
