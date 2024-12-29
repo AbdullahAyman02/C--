@@ -8,9 +8,8 @@
 function int void_function(int a, char b, string c) {
     int x = 5;
     int z = 99;
-    if (x == 4) then {
-        return z;
-    };
     return 44;
 };
+
+int x = void_function(1, 'a', "hello");
 

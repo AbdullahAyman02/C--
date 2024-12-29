@@ -23,6 +23,7 @@ class QuadrupleManager {
     // Generate a new temporary variable
     string newTemp();
 
+    void addQuadrupleInFront(const string& op, const string& arg1, const string& arg2, const string& result);
     void addQuadrupleInFront(const Quadruple& quadruple);
 
     // Generate a new label

@@ -43,6 +43,7 @@ class Function : public Symbol {
    private:
     vector<Variable*>* arguments;
     bool isReturnStatementPresent = false;
+    string label;
 
    public:
     Function(string name, Type returnType, vector<Variable*>* arguments, int line);
@@ -50,6 +51,8 @@ class Function : public Symbol {
     void print(VariadicTable<string, string, string, string>& vt) override;
     bool getIsReturnStatementPresent();
     void setIsReturnStatementPresent(bool isReturnStatementPresent);
+    void setLabel(string label);
+    string getLabel();
 };
 
 class SymbolTable {
@@ -69,4 +72,41 @@ class SymbolTable {
     SymbolTable* getParent();
     SymbolTable* createChild();
     void print();
+};
+
+struct FunctionMetadata {
+    bool isFunctionConsumedInScopeCheck;
+    Function* function;
+};
+
+struct Parameter {
+    Type type;
+    string name;
+};
+
+class FunctionContextSingleton {
+   private:
+    FunctionContextSingleton() {}
+    FunctionContextSingleton(FunctionContextSingleton const&) = delete;
+    void operator=(FunctionContextSingleton const&) = delete;
+    vector<FunctionMetadata> functionContext;
+
+   public:
+    static vector<FunctionMetadata>& getFunctionContext() {
+        static FunctionContextSingleton instance;
+        return instance.functionContext;
+    }
+
+    static Function* getCurrentFunction() {
+        vector<FunctionMetadata>& functionContext = FunctionContextSingleton::getFunctionContext();
+        if (functionContext.empty()) {
+            return nullptr;
+        }
+        for (auto it = functionContext.rbegin(); it != functionContext.rend(); ++it) {
+            if (it->function != nullptr) {
+                return it->function;
+            }
+        }
+        return nullptr;
+    }
 };

@@ -86,6 +86,14 @@ void Function::setIsReturnStatementPresent(bool isReturnStatementPresent) {
     this->isReturnStatementPresent = isReturnStatementPresent;
 }
 
+void Function::setLabel(string label) {
+    this->label = label;
+}
+
+string Function::getLabel() {
+    return this->label;
+}
+
 int SymbolTable::symbolTableIdCnt = 0;
 
 SymbolTable::SymbolTable() {
@@ -145,21 +153,14 @@ static SymbolTable globalSymbolTable;
 static SymbolTable* currentSymbolTable = &globalSymbolTable;
 static string getTypeName(Type type);
 
-struct FunctionMetadata {
-    bool isFunctionConsumedInScopeCheck;
-    Function* function;
-};
-
 struct SwitchCaseMetadata {
     Type type;
     int line;
 };
 
-static vector<FunctionMetadata> functionContext;
-
 extern "C" {
-
 static void pushFunctionArgumentListIfExistsToScopeSymbolTable() {
+    vector<FunctionMetadata>& functionContext = FunctionContextSingleton::getFunctionContext();
     if (functionContext.empty() || functionContext.back().function == nullptr || functionContext.back().isFunctionConsumedInScopeCheck) {
         functionContext.push_back({true, nullptr});
         return;
@@ -195,6 +196,7 @@ static void checkReturnStatementIsPresent(Function* function) {
 };
 
 static void popFunctionArgumentListIfExists() {
+    vector<FunctionMetadata>& functionContext = FunctionContextSingleton::getFunctionContext();
     if (functionContext.empty()) {
         return;
     }
@@ -204,20 +206,8 @@ static void popFunctionArgumentListIfExists() {
     checkReturnStatementIsPresent(function);
 }
 
-static Function* getCurrentFunction() {
-    if (functionContext.empty()) {
-        return nullptr;
-    }
-    for (auto it = functionContext.rbegin(); it != functionContext.rend(); ++it) {
-        if (it->function != nullptr) {
-            return it->function;
-        }
-    }
-    return nullptr;
-}
-
 void checkReturnStatementIsValid(Type returnType, int line) {
-    Function* currentFunction = getCurrentFunction();
+    Function* currentFunction = FunctionContextSingleton::getCurrentFunction();
     if (currentFunction == nullptr) {
         exitOnError("Return statement outside of function", line);
     }
@@ -259,8 +249,9 @@ void* createVariable(Type type, const char* name, int line, int isConstant) {
     return (void*)variable;
 }
 
-void* createFunction(Type returnType, const char* name, void* paramList, int line) {
-    vector<Variable*>* arguments = (vector<Variable*>*)paramList;
+void* createFunction(Type returnType, const char* name, void* argumentList, int line) {
+    vector<FunctionMetadata>& functionContext = FunctionContextSingleton::getFunctionContext();
+    vector<Variable*>* arguments = (vector<Variable*>*)argumentList;
     reverse(arguments->begin(), arguments->end());
 
     for (auto arg : *arguments) {
@@ -364,23 +355,23 @@ void* createArgumentList() {
     return (void*)new vector<Variable*>();
 }
 
-void addVariableToArgumentList(void* paramList, void* variable) {
-    vector<Variable*>* arguments = (vector<Variable*>*)paramList;
+void addVariableToArgumentList(void* argumentList, void* variable) {
+    vector<Variable*>* arguments = (vector<Variable*>*)argumentList;
     Variable* var = (Variable*)variable;
     arguments->push_back(var);
 }
 
 void* createParamList() {
-    return (void*)new vector<Type>();
+    return (void*)new vector<Parameter>();
 }
 
-void addTypeToParamList(void* paramList, Type type) {
-    vector<Type>* arguments = (vector<Type>*)paramList;
-    arguments->push_back(type);
+void addParamToParamList(void* paramList, const char* name, Type type) {
+    vector<Parameter>* arguments = (vector<Parameter>*)paramList;
+    arguments->push_back({type, name});
 }
 
 void checkParamListAgainstFunction(void* paramList, void* function, int line) {
-    vector<Type>* params = (vector<Type>*)paramList;
+    vector<Parameter>* params = (vector<Parameter>*)paramList;
     Function* func = (Function*)function;
     vector<Variable*>* arguments = func->getArguments();
     reverse(params->begin(), params->end());
@@ -390,7 +381,7 @@ void checkParamListAgainstFunction(void* paramList, void* function, int line) {
         exitOnError(message.c_str(), line);
     }
     for (int i = 0; i < params->size(); i++) {
-        Type paramType = params->at(i);
+        Type paramType = params->at(i).type;
         Type argType = arguments->at(i)->getType();
         if (paramType != argType) {
             string message = "Function " + func->getName() + " expects argument " + to_string(i + 1) + " to be of type ";
@@ -434,6 +425,16 @@ void checkSwitchCaseListAgainstType(void* switchCaseList, Type type) {
             exitOnError(message.c_str(), switchCase.line);
         }
     }
+}
+
+void setFunctionLabel(void* function, const char* label) {
+    Function* func = (Function*)function;
+    func->setLabel(label);
+}
+
+const char* getFunctionLabel(void* function) {
+    Function* func = (Function*)function;
+    return strdup(func->getLabel().c_str());
 }
 }
 

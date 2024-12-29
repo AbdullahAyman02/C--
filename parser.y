@@ -51,7 +51,7 @@
 
 %type <type> dataType 
 %type <exprValue> expression functionCall  caseCondition CASE_EXPRESSION
-%type <list> arguments argumentsList parameters parametersList case SCOPE_CLOSE scope
+%type <list> arguments argumentsList parameters parametersList case SCOPE_CLOSE scope FUNCTION_SIGNATURE
 
 %%
 // The grammar rules are defined here. The grammar rules define the structure of the language. They define how the tokens are combined to form statements, expressions, etc.
@@ -116,17 +116,34 @@ statement:
                                                                             addQuadrupleToCurrentQuadManager(endLabel, "", "", "");
 
                                                                         }
-    | FUNCTION_SIGNATURE scope                                          {  debugPrintf("function signature\n"); }
+    | FUNCTION_SIGNATURE scope                                          {  
+                                                                            void* function = $1;
+                                                                            void* quadManager = $2;
+                                                                            const char* skipFunctionLabel = newLabel();
+                                                                            addQuadrupleToCurrentQuadManager("JMP", "", "", skipFunctionLabel);
+                                                                            
+                                                                            const char* functionLabel = getFunctionLabel(function);
+
+                                                                            addQuadrupleToCurrentQuadManager(functionLabel, "", "", "");
+                                                                            
+                                                                            handleFunctionQuadruples(quadManager,function);
+                                                                            mergeQuadManagerToCurrentQuadManager(quadManager);
+                                                                            
+                                                                            addQuadrupleToCurrentQuadManager(skipFunctionLabel, "", "", "");
+                                                                        }
                                                                         
     | functionCall                                                      { debugPrintf("function call\n"); }
     | RETURN expression                                                 { 
                                                                             ExprValue* returnValue = $2;
                                                                             Type returnType = returnValue->type;
+                                                                            const char* returnName = returnValue->name;
                                                                             checkReturnStatementIsValid(returnType,yylineno);
+                                                                            handleFunctionReturnWithExprQuadruples(returnName);
                                                                         }
                                                                         //check return type
     | RETURN                                                            { 
                                                                             checkReturnStatementIsValid(VOID_T,yylineno);
+                                                                            handleFunctionReturnQuadruples();
                                                                         }                                                               
     ;
 
@@ -143,11 +160,18 @@ FUNCTION_SIGNATURE:
                                                             void* parametersList = $5;
                                                             void* function = createFunction($2,$3,parametersList,yylineno);
                                                             addSymbolToSymbolTable(function);
+
+                                                            const char* functionLabel = newLabel();
+                                                            setFunctionLabel(function,functionLabel);
+                                                            
+                                                            $$ = function;
                                                         }
     | FUNCTION VOID VARIABLE '(' arguments ')'         { 
                                                             void* parametersList = $5;
                                                             void* function = createFunction(VOID_T,$3,parametersList,yylineno);
                                                             addSymbolToSymbolTable(function);
+
+                                                            $$ = function;
                                                         }
     ;
 
@@ -691,8 +715,10 @@ functionCall:
                                         
                                         returnValue->type = getSymbolType(function);
                                         returnValue->value = (void*)functionName;
-                                        returnValue->name = functionName;   
+                                        returnValue->name = newTemp();
 
+                                        handleFunctionCallQuadruples(function,parametersList,returnValue->name);
+                                        
                                         $$ = returnValue;
                                     }
     ;
@@ -725,14 +751,19 @@ parameters:
     ;
 
 parametersList:
-    expression ',' parametersList           { void* paramList = $3; 
-                                                addTypeToParamList(paramList,$1->type);
+    expression ',' parametersList           {   void* paramList = $3; 
+                                                Type paramType = $1->type;
+                                                const char* paramName = $1->name;
+                                                addParamToParamList(paramList,paramName,paramType);
                                                 $$ = paramList;
                                             }
 
-    | expression                        { void* paramList = createParamList(); 
-                                            addTypeToParamList(paramList,$1->type);
-                                             $$ = paramList; 
+    | expression                        {   
+                                            void* paramList = createParamList(); 
+                                            Type paramType = $1->type;
+                                            const char* paramName = $1->name;
+                                            addParamToParamList(paramList,paramName,paramType);
+                                            $$ = paramList; 
                                         }
                                             
     ;

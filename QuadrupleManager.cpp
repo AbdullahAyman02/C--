@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "SymbolTable.hpp"
 #include "Vendor/VariadicTable.h"
 #include "common.h"
 void QuadrupleManager::addQuadruple(const string &op, const string &arg1, const string &arg2, const string &result) {
@@ -11,6 +12,10 @@ void QuadrupleManager::addQuadruple(const string &op, const string &arg1, const 
 
 void QuadrupleManager::addQuadruple(const Quadruple &quadruple) {
     quadruples.push_back(quadruple);
+}
+
+void QuadrupleManager::addQuadrupleInFront(const string &op, const string &arg1, const string &arg2, const string &result) {
+    quadruples.insert(quadruples.begin(), Quadruple(op, arg1, arg2, result));
 }
 
 void QuadrupleManager::addQuadrupleInFront(const Quadruple &quadruple) {
@@ -120,6 +125,49 @@ void mergeQuadManagerToCurrentQuadManagerInFront(void *quadManager) {
     vector<Quadruple> quads = quadManagerPtr->getQuadruples();
     for (auto it = quads.rbegin(); it != quads.rend(); ++it) {
         prevQuadManager->addQuadrupleInFront(*it);
+    }
+}
+
+void handleFunctionQuadruples(void *quadManager, void *function) {
+    QuadrupleManager *quadManagerPtr = (QuadrupleManager *)quadManager;
+    Function *func = (Function *)function;
+    vector<Variable *> *arguments = func->getArguments();
+    for (auto arg : *arguments) {
+        string argName = arg->getName();
+        quadManagerPtr->addQuadrupleInFront("POP", "", "", argName);
+    }
+    string returnLabel = "ret_" + func->getLabel() + "_var";
+    quadManagerPtr->addQuadrupleInFront("POP", "", "", returnLabel);
+    string returnLabelContent = "content(" + string(returnLabel) + ")";
+    quadManagerPtr->addQuadruple("JMP", returnLabelContent, "", "");
+}
+
+void handleFunctionReturnQuadruples() {
+    Function *function = FunctionContextSingleton::getCurrentFunction();
+    string returnLabel = "ret_" + function->getLabel() + "_var";
+    string returnLabelContent = "content(" + string(returnLabel) + ")";
+    addQuadrupleToCurrentQuadManager("JMP", returnLabelContent.c_str(), "", "");
+}
+
+void handleFunctionReturnWithExprQuadruples(const char *expr) {
+    addQuadrupleToCurrentQuadManager("PUSH", expr, "", "");
+    handleFunctionReturnQuadruples();
+}
+
+void handleFunctionCallQuadruples(void *function, void *paramList, const char *returnVar) {
+    Function *func = (Function *)function;
+    vector<Parameter> *params = (vector<Parameter> *)paramList;
+    vector<Variable *> *arguments = func->getArguments();
+    const char *returnLabel = newLabel();
+    for (int i = 0; i < params->size(); i++) {
+        addQuadrupleToCurrentQuadManager("PUSH", params->at(i).name.c_str(), "", "");
+    }
+    addQuadrupleToCurrentQuadManager("PUSH", returnLabel, "", "");
+    addQuadrupleToCurrentQuadManager("JMP", func->getLabel().c_str(), "", "");
+
+    addQuadrupleToCurrentQuadManager(returnLabel, "", "", "");
+    if (func->getType() != VOID_T) {
+        addQuadrupleToCurrentQuadManager("POP", "", "", returnVar);
     }
 }
 

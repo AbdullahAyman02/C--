@@ -44,10 +44,10 @@ void printSymbolTable();
 Type getSymbolType(void* symbol);
 void exitOnError(const char* message, int line);
 void* createArgumentList();
-void addVariableToArgumentList(void* paramList, void* variable);
-void* createFunction(Type returnType, const char* name, void* paramList, int line);
+void addVariableToArgumentList(void* argumentList, void* variable);
+void* createFunction(Type returnType, const char* name, void* argumentList, int line);
 void* createParamList();
-void addTypeToParamList(void* paramList, Type type);
+void addParamToParamList(void* paramList, const char* name, Type type);
 void checkParamListAgainstFunction(void* paramList, void* function, int line);
 void checkVariableIsNotConstant(void* symbol, int line);
 void* getVariableFromSymbolTable(const char* name, int line);
@@ -80,6 +80,13 @@ void removeLastCaseExpression();
 const char* convertFloatNumToChar(float num);
 const char* convertIntNumToChar(int num);
 const char* convertNumToChar(void* num, Type type);
+
+void setFunctionLabel(void* function, const char* label);
+const char* getFunctionLabel(void* function);
+void handleFunctionQuadruples(void* quadManager, void* function);
+void handleFunctionReturnQuadruples();
+void handleFunctionReturnWithExprQuadruples(const char* expr);
+void handleFunctionCallQuadruples(void* function, void* paramList, const char* returnVar);
 
 void* castExpressions(ExprValue* expr1, ExprValue* expr2, char operation, Type* castedType, int line);
 #ifdef __cplusplus
