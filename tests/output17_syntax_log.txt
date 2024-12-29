@@ -1,0 +1,7 @@
+Line 22 syntax Error: }
+Line 6 syntax Error: *
+Line 6 syntax Error: &
+Line 6 syntax Error: &
+Line 6 syntax Error: *
+Line 6 syntax Error: &
+Line 6 syntax Error: &

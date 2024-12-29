@@ -149,7 +149,6 @@ statement:
                                                                             void* quadManager = $2;
                                                                             const char* skipFunctionLabel = newLabel();
                                                                             addQuadrupleToCurrentQuadManager("JMP", "", "", skipFunctionLabel);
-                                                                            
                                                                             const char* functionLabel = getFunctionLabel(function);
 
                                                                             addQuadrupleToCurrentQuadManager(functionLabel, "", "", "");
@@ -204,6 +203,9 @@ FUNCTION_SIGNATURE:
                                                             void* parametersList = $5;
                                                             void* function = createFunction(VOID_T,$3,parametersList,yylineno);
                                                             addSymbolToSymbolTable(function);
+                                                            
+                                                            const char* functionLabel = newLabel();
+                                                            setFunctionLabel(function,functionLabel);
 
                                                             $$ = function;
                                                         }

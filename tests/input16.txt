@@ -1,0 +1,31 @@
+{
+    float y = 2.0;
+    float z = 3.0 + y;
+    string var = "test";
+    char c = 'k';
+    const char d = 'd';
+    bool flag = False;
+    int w = 3 ^ 7 * 3 / 4;
+    
+    repeat {
+        z = 7.3;
+        if (c == d) then {
+        flag = True;
+        }
+        else {
+            flag = False;
+        };
+    } until (w == 2);
+    // in repeat should it be JF?
+    
+    function int test_function() {
+        flag = True;
+        return 3;
+    };
+
+    int i;
+    int x;
+    for (i = 0; i < 10; i = i + 1) {
+        x = test_function();
+    };
+};
