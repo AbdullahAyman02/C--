@@ -3,6 +3,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+
 #endif
 
 // #define DEBUG
@@ -43,6 +44,7 @@ void checkBothParamsAreOfSameType(Type type1, Type type2, int line);
 void printSymbolTable(const char* inputFileName);
 Type getSymbolType(void* symbol);
 void exitOnError(const char* message, int line);
+void printLogToFile(const char* message, int line, const char* errorType);
 void* createArgumentList();
 void addVariableToArgumentList(void* argumentList, void* variable);
 void* createFunction(Type returnType, const char* name, void* argumentList, int line);
@@ -91,6 +93,8 @@ void handleForLoopQuadruples(const char* booleanExprVar, void* booleanExprQuadMa
 void handleRepeatUntilQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
 void handleWhileQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
 void* castExpressions(ExprValue* expr1, ExprValue* expr2, char operation, Type* castedType, int line);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -7,6 +7,7 @@
 #include "SymbolTable.hpp"
 #include "Vendor/VariadicTable.h"
 #include "common.h"
+
 void QuadrupleManager::addQuadruple(const string &op, const string &arg1, const string &arg2, const string &result) {
     printf("Adding quadruple: %s %s %s %s\n", op.c_str(), arg1.c_str(), arg2.c_str(), result.c_str());
     quadruples.emplace_back(op, arg1, arg2, result);
