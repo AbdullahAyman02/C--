@@ -187,6 +187,36 @@ void handleForLoopQuadruples(const char *booleanExprVar, void *booleanExprQuadMa
     addQuadrupleToCurrentQuadManager(endForLabel.c_str(), "", "", "");
 }
 
+void handleRepeatUntilQuadruples(const char *booleanExprVar, void *booleanExprQuadManager, void *scopeQuadManager) {
+    QuadrupleManager *booleanExprQuadManagerPtr = (QuadrupleManager *)booleanExprQuadManager;
+    QuadrupleManager *scopeQuadManagerPtr = (QuadrupleManager *)scopeQuadManager;
+
+    string repeatLabel = newLabel();
+    string endLabel = newLabel();
+
+    addQuadrupleToCurrentQuadManager(repeatLabel.c_str(), "", "", "");
+    mergeQuadManagerToCurrentQuadManager(scopeQuadManagerPtr);
+    mergeQuadManagerToCurrentQuadManager(booleanExprQuadManagerPtr);
+    addQuadrupleToCurrentQuadManager("JF", booleanExprVar, "", endLabel.c_str());
+    addQuadrupleToCurrentQuadManager("JMP", repeatLabel.c_str(), "", "");
+    addQuadrupleToCurrentQuadManager(endLabel.c_str(), "", "", "");
+}
+
+void handleWhileQuadruples(const char *booleanExprVar, void *booleanExprQuadManager, void *scopeQuadManager) {
+    QuadrupleManager *booleanExprQuadManagerPtr = (QuadrupleManager *)booleanExprQuadManager;
+    QuadrupleManager *scopeQuadManagerPtr = (QuadrupleManager *)scopeQuadManager;
+
+    string whileLabel = newLabel();
+    string endLabel = newLabel();
+
+    addQuadrupleToCurrentQuadManager(whileLabel.c_str(), "", "", "");
+    mergeQuadManagerToCurrentQuadManager(booleanExprQuadManagerPtr);
+    addQuadrupleToCurrentQuadManager("JF", booleanExprVar, "", endLabel.c_str());
+    mergeQuadManagerToCurrentQuadManager(scopeQuadManagerPtr);
+    addQuadrupleToCurrentQuadManager("JMP", whileLabel.c_str(), "", "");
+    addQuadrupleToCurrentQuadManager(endLabel.c_str(), "", "", "");
+}
+
 void addQuadruple(const char *op, const char *arg1, const char *arg2, const char *result) {
     mainQuadrupleManager.addQuadruple(op, arg1, arg2, result);
 }

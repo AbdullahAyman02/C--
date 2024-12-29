@@ -1,0 +1,6 @@
+int x = 5;
+bool flag = False;
+
+repeat {
+    x = 7;
+} until (flag == False);

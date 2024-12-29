@@ -64,8 +64,22 @@ program:
 
 statement:
     initialization                                                      { debugPrintf("initialization\n");}
-    | WHILE '(' BOOLEAN_EXPRESSION ')' scope                                    { debugPrintf("while\n");}
-    | REPEAT scope UNTIL '(' BOOLEAN_EXPRESSION ')'                             { debugPrintf("repeat\n");}
+    | WHILE '(' OPEN_QUAD_MANAGER BOOLEAN_EXPRESSION CLOSE_QUAD_MANAGER ')' scope                                    
+                                                                                        { 
+                                                                                            ExprValue* booleanExpr = $4;
+                                                                                            const char* booleanExprName = booleanExpr->name;
+                                                                                            void* booleanExprQuadManager = $5;
+                                                                                            void* scopeQuadManager = $7;
+                                                                                            handleWhileQuadruples(booleanExprName,booleanExprQuadManager,scopeQuadManager);
+                                                                                        }
+    | REPEAT scope UNTIL '(' OPEN_QUAD_MANAGER BOOLEAN_EXPRESSION CLOSE_QUAD_MANAGER')' 
+                                                                                        { 
+                                                                                            ExprValue* booleanExpr = $6;
+                                                                                            const char* booleanExprName = booleanExpr->name;
+                                                                                            void* booleanExprQuadManager = $7;
+                                                                                            void* scopeQuadManager = $2;
+                                                                                            handleRepeatUntilQuadruples(booleanExprName,booleanExprQuadManager,scopeQuadManager);
+                                                                                        }
     | FOR '(' forLoopInitialization ';'OPEN_QUAD_MANAGER BOOLEAN_EXPRESSION CLOSE_QUAD_MANAGER ';' OPEN_QUAD_MANAGER assignment CLOSE_QUAD_MANAGER ')' scope
                                                                                                 { 
                                                                                                     ExprValue* booleanExpr = $6;

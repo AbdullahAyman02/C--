@@ -88,7 +88,8 @@ void handleFunctionReturnQuadruples();
 void handleFunctionReturnWithExprQuadruples(const char* expr);
 void handleFunctionCallQuadruples(void* function, void* paramList, const char* returnVar);
 void handleForLoopQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* assignmentQuadManager, void* scopeQuadManager);
-
+void handleRepeatUntilQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
+void handleWhileQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
 void* castExpressions(ExprValue* expr1, ExprValue* expr2, char operation, Type* castedType, int line);
 #ifdef __cplusplus
 }
