@@ -23,11 +23,11 @@ void QuadrupleManager::addQuadrupleInFront(const Quadruple &quadruple) {
 }
 
 string QuadrupleManager::newTemp() {
-    return "t" + std::to_string(tempCount++);
+    return "T" + std::to_string(tempCount++);
 }
 
 string QuadrupleManager::newLabel() {
-    return "L" + std::to_string(labelCount++);
+    return "L" + std::to_string(labelCount++) + ":";
 }
 
 int QuadrupleManager::generateNewExitLabel() {
@@ -87,12 +87,12 @@ void removeLastCaseExpression() {
 
 const char *generateNewExitLabelFromCurrentQuadManager() {
     int labelId = quadrupleManagers.back()->generateNewExitLabel();
-    return strdup(("L" + std::to_string(labelId)).c_str());
+    return strdup(("L" + std::to_string(labelId) + ":").c_str());
 }
 
 const char *getExitLabelFromCurrentQuadManager() {
     int labelId = quadrupleManagers.back()->getExitLabel();
-    return strdup(("L" + std::to_string(labelId)).c_str());
+    return strdup(("L" + std::to_string(labelId) + ":").c_str());
 }
 
 void enterQuadManager() {

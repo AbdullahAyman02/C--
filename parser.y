@@ -128,7 +128,7 @@ statement:
                                                                             mergeQuadManagerToCurrentQuadManager(scopeMgr1);
                                                                             
                                                                             const char* endLabel = newLabel();
-                                                                            addQuadrupleToCurrentQuadManager("jmp", "", "", endLabel);
+                                                                            addQuadrupleToCurrentQuadManager("JMP", "", "", endLabel);
 
                                                                             addQuadrupleToCurrentQuadManager(elseLabel, "", "", "");
 
@@ -254,7 +254,7 @@ declaration:
                                                             debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         #endif
 
-                                                        addQuadrupleToCurrentQuadManager("=", assignmentName, "", varName);
+                                                        addQuadrupleToCurrentQuadManager("ASSIGN", assignmentName, "", varName);
                                                 }
     | CONST dataType VARIABLE '=' expression {     
                                                         Type varType = $2;
@@ -273,7 +273,7 @@ declaration:
                                                         #endif
                                                        
                                                         
-                                                        addQuadrupleToCurrentQuadManager("=", assignmentName, "", varName);
+                                                        addQuadrupleToCurrentQuadManager("ASSIGN", assignmentName, "", varName);
                                                   }
     ;
 
@@ -304,7 +304,7 @@ assignment:
                                                 debugPrintf("Variable: %s = %s\n", varName, valName);
                                             #endif
                                             
-                                            addQuadrupleToCurrentQuadManager("=", valName, "", varName);
+                                            addQuadrupleToCurrentQuadManager("ASSIGN", valName, "", varName);
                                             
                                         }
                                        
@@ -392,7 +392,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("+", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("ADD", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'+',&returnValue->type,yylineno);
@@ -416,7 +416,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("-", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("SUB", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'-',&returnValue->type,yylineno);
@@ -440,7 +440,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("*", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("MUL", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'*',&returnValue->type,yylineno);
@@ -464,7 +464,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("/", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("DIV", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'/',&returnValue->type,yylineno);
@@ -488,7 +488,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("^", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("POW", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
                                     returnValue->value = castExpressions(expr1,expr2,'^',&returnValue->type,yylineno);
@@ -522,7 +522,7 @@ expression:
                                     }
 
                                     returnValue->name = tempVar;
-                                    addQuadrupleToCurrentQuadManager("Minus", "", exprName, tempVar);
+                                    addQuadrupleToCurrentQuadManager("NEG", "", exprName, tempVar);
                                     $$ = returnValue;
 
                                     #ifdef DEBUG
@@ -543,7 +543,7 @@ BOOLEAN_EXPRESSION:
                                     const char* expr2Name = $3->name;
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("||", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("OR", expr1Name, expr2Name, tempVar);
                                     returnValue->type = BOOLEAN_T;
                                     
                                     int *val = (int*)malloc(sizeof(int));
@@ -567,7 +567,7 @@ BOOLEAN_EXPRESSION:
                                     const char* expr2Name = $3->name;
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("&&", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("AND", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(int*)$1->value && *(int*)$3->value;
@@ -592,7 +592,7 @@ BOOLEAN_EXPRESSION:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("<", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("LT", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value < *(float*)$3->value;
@@ -617,7 +617,7 @@ BOOLEAN_EXPRESSION:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager(">", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("GT", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value > *(float*)$3->value;
@@ -642,7 +642,7 @@ BOOLEAN_EXPRESSION:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager(">=", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("GTE", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value >= *(float*)$3->value;
@@ -667,7 +667,7 @@ BOOLEAN_EXPRESSION:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("<=", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("LTE", expr1Name, expr2Name, tempVar);
                                     
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value <= *(float*)$3->value;
@@ -692,7 +692,7 @@ BOOLEAN_EXPRESSION:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("==", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("EQ", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value == *(float*)$3->value;
@@ -717,7 +717,7 @@ BOOLEAN_EXPRESSION:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
 
                                     checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
-                                    addQuadrupleToCurrentQuadManager("!=", expr1Name, expr2Name, tempVar);
+                                    addQuadrupleToCurrentQuadManager("NEQ", expr1Name, expr2Name, tempVar);
 
                                     int *val = (int*)malloc(sizeof(int));
                                     *val = *(float*)$1->value != *(float*)$3->value;
@@ -816,9 +816,9 @@ case:
                                                 
                                                 const char* tempVar = newTemp();
                                                 addQuadrupleToQuadManagerInFront(quadManager,"JF", tempVar, "", label);
-                                                addQuadrupleToQuadManagerInFront(quadManager,"==", caseExpression, caseValue->name, tempVar);
+                                                addQuadrupleToQuadManagerInFront(quadManager,"EQ", caseExpression, caseValue->name, tempVar);
 
-                                                addQuadrupleToQuadManager(quadManager,"jmp", "", "", exitLabel);
+                                                addQuadrupleToQuadManager(quadManager,"JMP", "", "", exitLabel);
                                                 addQuadrupleToQuadManager(quadManager,label, "", "", "");
 
                                                 mergeQuadManagerToCurrentQuadManagerInFront(quadManager);
@@ -838,9 +838,9 @@ case:
                                                 
                                                 const char* tempVar = newTemp();
                                                 addQuadrupleToQuadManagerInFront(quadManager,"JF", tempVar, "", label);
-                                                addQuadrupleToQuadManagerInFront(quadManager,"==", caseExpression, caseValue->name, tempVar);
+                                                addQuadrupleToQuadManagerInFront(quadManager,"EQ", caseExpression, caseValue->name, tempVar);
 
-                                                addQuadrupleToQuadManager(quadManager,"jmp", "", "", exitLabel);
+                                                addQuadrupleToQuadManager(quadManager,"JMP", "", "", exitLabel);
                                                 addQuadrupleToQuadManager(quadManager,label, "", "", "");
                                                 
                                                 mergeQuadManagerToCurrentQuadManagerInFront(quadManager);
@@ -890,7 +890,8 @@ int main(int argc, char **argv) {
     }
 
     // Open the input file
-    yyin = fopen(argv[1], "r");
+    const char* inputFileName = argv[1];
+    yyin = fopen(inputFileName, "r");
     if(yyin == NULL) {
         debugPrintf("Error: Unable to open file %s\n", argv[1]);
         return 1;
@@ -898,9 +899,9 @@ int main(int argc, char **argv) {
     
     // Call the parser
     yyparse();
-    // printSymbolTable();
     printSymbolTable();
     printQuadruples();
+
     // Close the input file
     fclose(yyin);
     return 0;
