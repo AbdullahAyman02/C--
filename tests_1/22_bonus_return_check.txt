@@ -1,0 +1,11 @@
+
+
+function int power(int base, int exponent) {
+    if (exponent == 0) then {
+        return 3.0;
+    };
+    return 1;
+};
+
+int x = 3.0<power(2, 3);
+

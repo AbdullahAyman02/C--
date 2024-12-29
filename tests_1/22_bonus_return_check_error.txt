@@ -1,0 +1,4 @@
+Line 13 Semantic Error: Variable z is not initialized
+
+Line 5 Semantic Error: Return type mismatch. Expected integer but got float
+

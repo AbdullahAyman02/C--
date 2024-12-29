@@ -1,0 +1,25 @@
+Line 7 Semantic Error: First parameter is not a number
+
+Line 7 Semantic Error: First parameter is not a number
+
+Line 7 Semantic Error: First parameter is not a number
+
+Line 7 Semantic Error: Second parameter is not a number
+
+Line 7 Semantic Error: First parameter is not a number
+
+Line 7 Semantic Error: First parameter is not a number
+
+Line 8 Semantic Error: First parameter is not a number
+
+Line 8 Semantic Error: First parameter is not a number
+
+Warning: Variable ok declared in line 8 is not used
+Line 7 Semantic Error: Symbol z already exists in line 5
+
+Warning: Variable w declared in line 4 is not used
+Warning: Variable ok declared in line 7 is not used
+Warning: Variable w declared in line 4 is not used
+Warning: Variable ok declared in line 7 is not used
+Warning: Variable w declared in line 4 is not used
+Warning: Variable ok declared in line 7 is not used

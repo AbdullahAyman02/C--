@@ -1,0 +1,98 @@
+------ Symbol Table 0 ------
+Empty
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| w    | Var  | integer |  -    |
+| z    | Var  | integer |  -    |
+| y    | Var  | integer |  -    |
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 1 ------
+------ Symbol Table 2 ------
+Empty
+
+------ Child of Symbol Table 2 ------
+------ Symbol Table 3 ------
+Empty
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 4 ------
+Empty
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 5 ------
+Empty
+
+------ Child of Symbol Table 5 ------
+------ Symbol Table 6 ------
+Empty
+
+------ Child of Symbol Table 5 ------
+------ Symbol Table 7 ------
+Empty
+
+------ Child of Symbol Table 7 ------
+------ Symbol Table 8 ------
+Empty
+
+------ Child of Symbol Table 8 ------
+------ Symbol Table 9 ------
+Empty
+
+------ Child of Symbol Table 9 ------
+------ Symbol Table 10 ------
+Empty
+
+------ Child of Symbol Table 9 ------
+------ Symbol Table 11 ------
+Empty
+
+------ Child of Symbol Table 9 ------
+------ Symbol Table 12 ------
+Empty
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 13 ------
+Empty
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 14 ------
+Empty
+
+------ Child of Symbol Table 14 ------
+------ Symbol Table 15 ------
+Empty
+
+------ Child of Symbol Table 14 ------
+------ Symbol Table 16 ------
+Empty
+
+------ Child of Symbol Table 16 ------
+------ Symbol Table 17 ------
+Empty
+
+------ Child of Symbol Table 17 ------
+------ Symbol Table 18 ------
+Empty
+
+------ Child of Symbol Table 18 ------
+------ Symbol Table 19 ------
+Empty
+
+------ Child of Symbol Table 18 ------
+------ Symbol Table 20 ------
+Empty
+
+------ Child of Symbol Table 18 ------
+------ Symbol Table 21 ------
+Empty
+
+------ Child of Symbol Table 1 ------
+------ Symbol Table 22 ------
+Empty
+

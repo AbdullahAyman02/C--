@@ -1,0 +1,36 @@
+------ Symbol Table 0 ------
+---------------------------------------------
+|   Name    | Kind |  Type   |     Other    |
+---------------------------------------------
+| fibonacci | Func | integer | args cnt = 1 |
+| n         | Arg  | integer |  -           |
+| add       | Func | integer | args cnt = 2 |
+| a         | Arg  | integer |  -           |
+| b         | Arg  | integer |  -           |
+---------------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| b    | Var  | integer |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| n    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 2 ------
+------ Symbol Table 3 ------
+Empty
+
+------ Child of Symbol Table 2 ------
+------ Symbol Table 4 ------
+Empty
+

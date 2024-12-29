@@ -1,0 +1,7 @@
+int x = 5;
+int y;
+y = 10;
+int w = y+5;
+int z = (x + (y*5))^5;
+
+bool ok = (z>5)==True;

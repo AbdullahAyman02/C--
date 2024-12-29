@@ -1,0 +1,10 @@
+function int main(int x) {
+    x = x*x;
+    return x;
+};
+
+function int main2(int a,int b,int c){
+    return a*b+c;
+};
+
+int xx = 5;

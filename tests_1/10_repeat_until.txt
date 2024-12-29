@@ -1,0 +1,6 @@
+int x = 5;
+
+repeat {
+    const int one = 1;
+    x = x - one;
+} until(x == 0);

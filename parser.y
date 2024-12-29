@@ -256,7 +256,7 @@ declaration:
                                                         void* variable = createVariable(varType,varName, yylineno,0);
                                                         setVariableAsInitialized(variable);
 
-                                                        checkBothParamsAreNumbers(varType,assignmentType,yylineno);
+                                                        
                                                         checkBothParamsAreOfSameType(varType,assignmentType,yylineno);
                                                         addSymbolToSymbolTable(variable);
                                                         

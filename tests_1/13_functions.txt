@@ -1,0 +1,17 @@
+function int add(int a, int b) {
+    return a + b;
+};
+
+function int fibonacci(int n) {
+    if (n == 0) then {
+        return 0;
+    };
+    if (n == 1) then {
+        return 1;
+    };
+    return fibonacci(n-1) + fibonacci(n-2);
+};
+
+add(5, 10);
+
+fibonacci(10);

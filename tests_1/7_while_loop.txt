@@ -1,0 +1,7 @@
+
+int x = 5;
+
+while(x > 0) {
+    const int one = 1;
+    x = x - one;
+};

@@ -1,0 +1,43 @@
+------ Symbol Table 0 ------
+----------------------------------
+| Name  | Kind |  Type   | Other |
+----------------------------------
+| flag2 | Var  | boolean |  -    |
+| flag1 | Var  | boolean |  -    |
+| w     | Var  | integer |  -    |
+----------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+Empty
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 2 ------
+Empty
+
+------ Child of Symbol Table 2 ------
+------ Symbol Table 3 ------
+----------------------------------------
+| Name | Kind |  Type   |     Other    |
+----------------------------------------
+| main | Func | integer | args cnt = 0 |
+----------------------------------------
+
+------ Child of Symbol Table 3 ------
+------ Symbol Table 4 ------
+-----------------------------------------
+| Name  | Kind |  Type   |     Other    |
+-----------------------------------------
+| main3 | Func | void    | args cnt = 1 |
+| ccc   | Arg  | boolean |  -           |
+| a     | Var  | integer |  -           |
+-----------------------------------------
+
+------ Child of Symbol Table 4 ------
+------ Symbol Table 5 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| ccc  | Var  | boolean |  -    |
+---------------------------------
+

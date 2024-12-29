@@ -1,0 +1,4 @@
+Error: syntax error at line 10, near 'bool'
+
+Line 10 Semantic Error: Parameters are not of the same type Type mismatch: First parameter is of type boolean ,Second parameter is of type integer
+

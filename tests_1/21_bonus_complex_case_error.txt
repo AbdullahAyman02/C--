@@ -1,0 +1,1 @@
+Warning: Variable w declared in line 5 is not used

@@ -1,0 +1,3 @@
+Line 3 Semantic Error: Variable x is constant
+
+Warning: Variable x declared in line 1 is not used

@@ -1,0 +1,4 @@
+Error: syntax error at line 3, near ')'
+
+Error: syntax error at line 3, near ';'
+

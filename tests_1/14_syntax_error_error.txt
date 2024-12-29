@@ -1,0 +1,4 @@
+Error: syntax error at line 1, near ''
+
+Error: Invalid character at line 1, near '\'
+

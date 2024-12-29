@@ -1,0 +1,2 @@
+Line 8 Semantic Error: Switch case expects type integer but got char
+

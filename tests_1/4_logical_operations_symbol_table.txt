@@ -1,0 +1,11 @@
+------ Symbol Table 0 ------
+-------------------------------------
+|   Name   | Kind |  Type   | Other |
+-------------------------------------
+| ok       | Var  | boolean |  -    |
+| x        | Var  | integer |  -    |
+| y        | Var  | integer |  -    |
+| ok1      | Var  | boolean |  -    |
+| expected | Var  | boolean | Const |
+-------------------------------------
+

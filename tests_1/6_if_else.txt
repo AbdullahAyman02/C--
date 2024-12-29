@@ -1,0 +1,11 @@
+// if testing
+
+int x = 5;
+int y = 10;
+
+if(x > y) then {
+    const int z = 5;
+    x = x + z;
+} else {
+    y = y + 5;
+};

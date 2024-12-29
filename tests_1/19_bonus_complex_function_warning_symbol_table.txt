@@ -1,0 +1,31 @@
+------ Symbol Table 0 ------
+-----------------------------------------
+| Name  | Kind |  Type   |     Other    |
+-----------------------------------------
+| xx    | Var  | integer |  -           |
+| main2 | Func | integer | args cnt = 3 |
+| a     | Arg  | integer |  -           |
+| b     | Arg  | integer |  -           |
+| c     | Arg  | integer |  -           |
+| main  | Func | integer | args cnt = 1 |
+| x     | Arg  | integer |  -           |
+-----------------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| x    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 2 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| c    | Var  | integer |  -    |
+| b    | Var  | integer |  -    |
+| a    | Var  | integer |  -    |
+---------------------------------
+

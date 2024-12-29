@@ -1,0 +1,2 @@
+Line 8 Semantic Error: Symbol z already exists in line 5
+

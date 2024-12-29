@@ -1,0 +1,12 @@
+------ Symbol Table 0 ------
+---------------------------------
+| Name | Kind |  Type   | Other |
+---------------------------------
+| i    | Var  | integer |  -    |
+| z    | Var  | integer |  -    |
+---------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+Empty
+

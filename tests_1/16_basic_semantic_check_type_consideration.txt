@@ -1,0 +1,10 @@
+function int main() {
+    int a;
+    a = 4;
+    a = 5;
+    a = 6;
+    a = a*a;
+    return a;
+};
+
+bool ok = main();

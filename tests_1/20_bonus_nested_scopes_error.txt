@@ -1,0 +1,7 @@
+Error: syntax error at line 19, near 'main3'
+
+Line 20 Semantic Error: Symbol a already exists in line 14
+
+Warning: Function main declared in line 13 is not used
+Warning: Function main declared in line 13 is not used
+Warning: Variable ccc declared in line 19 is not used
