@@ -1,23 +1,18 @@
-// To compile and run
-// Run in the terminal the following commands:
-// flex lexer.l
-// bison --yacc -d parser.y
-// gcc .\lex.yy.c .\y.tab.c -o parser
-// .\parser.exe
 
-{int y = 2;
-float z = 3;
+float y = 2.0;
+float z = 3.0 + y;
 string var = "test";
 char c = 'c';
 const char d = 'd';
 bool flag = False;
-switch (y) {
+int w = 3 ^ 7 * 3 / 4;
+switch (w) {
     case 2: {
     flag = True;
     }
 };
 repeat {
-    x = 7.3;
+    z = 7.3;
 } until (flag == False);
 if (c == d) then {
     flag = True;
@@ -25,6 +20,7 @@ if (c == d) then {
 else {
     flag = False;
 };
+
 if (y + z < y - z) then {
     flag = False;
 };
@@ -33,10 +29,12 @@ function int test_function() {
     //ret 3;
     return 3;
 };
-function void void_function(int a, char b, string c) {
+
+function void void_function(int a, char b, string k) {
     return;
 };
-for(int i = 0; i < i; i=i + 1) {
+
+int i;
+for (i = 0; i < i; i=i + 1) {
     flag = False;
-};
 };
