@@ -1,4 +1,4 @@
-
+{
 float y = 2.0;
 float z = 3.0 + y;
 string var = "test";
@@ -37,4 +37,5 @@ function void void_function(int a, char b, string k) {
 int i;
 for (i = 0; i < i; i=i + 1) {
     flag = False;
+};
 };

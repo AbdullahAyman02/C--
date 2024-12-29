@@ -102,7 +102,12 @@ statement:
                                                                             void* quadManager = exitQuadManager();
                                                                             mergeQuadManagerToCurrentQuadManager(quadManager);
                                                                         }
-    | scope                                                             { debugPrintf("scope\n");}
+    | scope                                                             { 
+                                                                            debugPrintf("scope\n");
+
+                                                                            void* quadManager = $1;
+                                                                            mergeQuadManagerToCurrentQuadManager(quadManager);
+                                                                        }
     | IF '(' expression ')' THEN scope                                  { 
                                                                             debugPrintf("if\n");
 
