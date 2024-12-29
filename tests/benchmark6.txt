@@ -1,0 +1,65 @@
+
+//COMBO EXPRESSION TEST
+function int sum(int x, int y)
+{
+  return x + y;
+};
+
+function void fun(int x){
+    int res;
+    if (x>7) then
+    {
+        res = 7;
+    }
+    else{
+        res = 10;
+    };
+};
+
+function int paramChecker(string str, float ff, char c){
+    if (ff > 7.5) then
+    {  
+        int i;
+        for ( i = 0; i < 10; i = i+1)
+        {
+            int b = paramChecker("breaker", 3.5, 'd');
+        };
+        return 8;
+    }
+    else{
+        return 10;
+    };
+};
+
+function int returnChecker(string str, float ff, char c){
+    int res;
+    if (ff>7.5) then
+    {
+        res = 8;
+    }
+    else{
+        res = 10;
+    };
+    return res;
+};
+
+function bool booleanFunc()
+{
+    int f = 5;
+    if (f > 10) then
+    {
+        return False;
+    }
+    else
+    {
+        return True;
+    };
+    return False;
+};
+
+function void main()
+{
+    int a = sum(10, 20);
+    fun(a);
+    a = (paramChecker("S", 3.5,'d') + 3) ^ 2;
+};

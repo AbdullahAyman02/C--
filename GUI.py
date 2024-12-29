@@ -11,6 +11,7 @@ import os
 
 temp_path = "temp/temp_input.txt"
 
+
 class CompilerGUI:
     def __init__(self, root):
         self.root = root
@@ -30,16 +31,16 @@ class CompilerGUI:
         self.dark_mode = True
         self.editor_bg_dark = "#2e2e2e"
         self.editor_fg_dark = "#fefefe"
-        self.editor_insert_bg_dark = "#fefefe" 
+        self.editor_insert_bg_dark = "#fefefe"
         self.editor_select_bg_dark = "#555555"
-        self.root_bg_dark = "#2e2e2e" 
+        self.root_bg_dark = "#2e2e2e"
 
         # Light mode settings for the text editor
-        self.editor_bg_light = "#fefefe" 
+        self.editor_bg_light = "#fefefe"
         self.editor_fg_light = "#000000"
-        self.editor_insert_bg_light = "#000000" 
-        self.editor_select_bg_light = "#cccccc" 
-        self.root_bg_light = "#fefefe" 
+        self.editor_insert_bg_light = "#000000"
+        self.editor_select_bg_light = "#cccccc"
+        self.root_bg_light = "#fefefe"
 
         # Define a custom font
         custom_font = font.Font(family="JetBrains Mono", size=12)
@@ -67,25 +68,31 @@ class CompilerGUI:
                                             hover_color="#087bb8",width=100,height=35,font=("JetBrains Mono", 16, "bold"), bg_color="transparent")
         #tk.Button(root, text="Compile", command=self.compile_code, font=("JetBrains Mono", 12, "bold"),
         #                                bg="blue", fg="white")
-        self.compile_button.grid(row=1, column=1, rowspan=1, padx=5, sticky="n")
+        self.compile_button.grid(
+            row=1, column=1, rowspan=1, padx=5, sticky="n")
 
-        #self.compile_button.bind("<Enter>", lambda e: self.on_enter(e, "darkblue"))
-        #self.compile_button.bind("<Leave>", lambda e: self.on_leave(e, "blue"))
-        #self.compile_button.bind("<ButtonPress>", self.on_press)
-        #self.compile_button.bind("<ButtonRelease>", self.on_release)
+        # self.compile_button.bind("<Enter>", lambda e: self.on_enter(e, "darkblue"))
+        # self.compile_button.bind("<Leave>", lambda e: self.on_leave(e, "blue"))
+        # self.compile_button.bind("<ButtonPress>", self.on_press)
+        # self.compile_button.bind("<ButtonRelease>", self.on_release)
 
         original_image = Image.open("Images/dark_mode2.png")
         resized_image = original_image.resize((30, 30), Image.LANCZOS)
         self.theme_icon = ImageTk.PhotoImage(resized_image)
 
-        self.toggle_theme_button = tk.Button(root, image=self.theme_icon, command=self.toggle_theme)
-        self.toggle_theme_button.grid(row=0, column=1, padx=5, pady=5, sticky="ne")
-        self.toggle_theme_button.bind("<Enter>", lambda e: self.on_enter(e, "lightgray"))
-        self.toggle_theme_button.bind("<Leave>", lambda e: self.on_leave(e, "white"))
+        self.toggle_theme_button = tk.Button(
+            root, image=self.theme_icon, command=self.toggle_theme)
+        self.toggle_theme_button.grid(
+            row=0, column=1, padx=5, pady=5, sticky="ne")
+        self.toggle_theme_button.bind(
+            "<Enter>", lambda e: self.on_enter(e, "lightgray"))
+        self.toggle_theme_button.bind(
+            "<Leave>", lambda e: self.on_leave(e, "white"))
 
         self.open_file_button = ctk.CTkButton(root, text = 'Open File',text_color="#FFFFFF",command=self.open_file,fg_color="#50e650",hover_color="#39a639",width=100,height=35,font=("JetBrains Mono", 16, "bold"), bg_color="transparent")
 
-        self.open_file_button.grid(row=2, column=1, padx=5, pady=5, sticky="se")
+        self.open_file_button.grid(
+            row=2, column=1, padx=5, pady=5, sticky="se")
 
     def compile_code(self):
         code = self.editor.get("1.0", tk.END)
@@ -101,7 +108,8 @@ class CompilerGUI:
         threading.Thread(target=self.run_compiler).start()
 
     def run_compiler(self):
-        process = subprocess.Popen(["./parser.exe", temp_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process = subprocess.Popen(
+            ["./parser.exe", temp_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         self.output.config(state='normal')
         self.output.delete("1.0", tk.END)
@@ -156,7 +164,8 @@ class CompilerGUI:
         event.widget.config(bg="blue")
 
     def open_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Text files", "*.txt")])
         if file_path:
             with open(file_path, "r") as file:
                 content = file.read()
@@ -171,6 +180,7 @@ class CompilerGUI:
                 content = file.read()
                 self.editor.delete("1.0", tk.END)
                 self.editor.insert(tk.END, content)
+
 
 if __name__ == "__main__":
     root = TkinterDnD.Tk()

@@ -1,0 +1,17 @@
+/*
+    ======================================== LOGICAL ================================================
+*/
+
+bool bresult;
+bool bolo1 = True;
+bool bolo2 = False;
+bresult = bolo1 && bolo1;
+bresult = !bolo1;
+bresult = op1 == op2;
+bresult = op1 != op2;
+bresult = op1 > op2 && op1 < op2;
+bresult = op1 >= op2;
+bresult = op1 <= op2;
+
+//COMBO EXPRESSION TEST
+bresult = !((bolo1 || !bolo1) && bolo1 || bolo2 != (bolo1 < bolo2));

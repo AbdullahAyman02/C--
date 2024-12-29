@@ -1,0 +1,11 @@
+int k = 0;
+const int St = 100;
+int declaration;
+float decWith_Assign=5.2;
+int x = 0;
+int y = 10;
+int z = x / y - x;
+string str = "";
+string welcome = "Hello World!";
+bool a = True;
+bool b = False;
