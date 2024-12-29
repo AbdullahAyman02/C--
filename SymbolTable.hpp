@@ -13,6 +13,7 @@ class Symbol {
     string name;
     Type type;
     int line;
+    bool isUsed = false;
 
    public:
     Symbol(string name, Type type, int line);
@@ -21,6 +22,8 @@ class Symbol {
     string getName();
     int getLine();
     Type getType();
+    void setIsUsed(bool isUsed);
+    bool getIsUsed();
 };
 
 class Variable : public Symbol {
@@ -61,17 +64,24 @@ class SymbolTable {
     SymbolTable* parent;
     vector<SymbolTable*> children;
     int id;
-
     static int symbolTableIdCnt;
 
    public:
     SymbolTable();
     SymbolTable(SymbolTable* parent);
+
     void insert(Symbol* symbol);
     Symbol* lookup(string name);
+
     SymbolTable* getParent();
     SymbolTable* createChild();
-    void print(const string& inputFileName = "");
+
+    // print symbol table and its children
+    void print(ofstream& outFile);
+    bool isEmpty();
+
+    // get all unused symbols in the symbol table and its children
+    vector<Symbol*> getUnusedSymbols();
 };
 
 struct FunctionMetadata {

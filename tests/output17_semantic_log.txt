@@ -1,2 +1,0 @@
-Line 7 semantic Error: Symbol printf not found
-Line 23 semantic Error: Symbol xx not found

@@ -25,12 +25,9 @@ typedef enum {
 
 typedef struct {
     Type type;
-    void* value;
     const char* name;
     int line;
 } ExprValue;
-
-const char* exprToString(ExprValue* exprValue);
 
 void enterScope();
 void exitScope(int line);
@@ -42,9 +39,10 @@ void checkBothParamsAreBoolean(Type type1, Type type2, int line);
 void checkParamIsNumber(Type type, int line);
 void checkBothParamsAreOfSameType(Type type1, Type type2, int line);
 void printSymbolTable(const char* inputFileName);
+void printUnusedSymbols(const char* inputFileName);
 Type getSymbolType(void* symbol);
 void exitOnError(const char* message, int line);
-void printLogToFile(const char* message, int line, const char* errorType);
+void printExitMsgToFile(const char* message);
 void* createArgumentList();
 void addVariableToArgumentList(void* argumentList, void* variable);
 void* createFunction(Type returnType, const char* name, void* argumentList, int line);
@@ -92,9 +90,8 @@ void handleFunctionCallQuadruples(void* function, void* paramList, const char* r
 void handleForLoopQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* assignmentQuadManager, void* scopeQuadManager);
 void handleRepeatUntilQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
 void handleWhileQuadruples(const char* booleanExprVar, void* booleanExprQuadManager, void* scopeQuadManager);
-void* castExpressions(ExprValue* expr1, ExprValue* expr2, char operation, Type* castedType, int line);
 
-
+char* getOutputFileName(const char* inputFileName, const char* postfix);
 #ifdef __cplusplus
 }
 #endif

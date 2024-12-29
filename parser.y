@@ -2,6 +2,7 @@
     #include "common.h"
     #include <stdio.h>      // for functions like printf and scanf
     #include <string.h>     // for string functions like strdup
+    #include <stdlib.h>
     void yyerror(char *);   // for error handling. This function is called when an error occurs
     int yylex(void);        // for lexical analysis. This function is called to get the next token
     extern FILE *yyin;      // for file handling. This is the input file. The default is stdin
@@ -167,7 +168,7 @@ statement:
                                                                             checkReturnStatementIsValid(returnType,yylineno);
                                                                             handleFunctionReturnWithExprQuadruples(returnName);
                                                                         }
-                                                                        //check return type
+                                                                        
     | RETURN                                                            { 
                                                                             checkReturnStatementIsValid(VOID_T,yylineno);
                                                                             handleFunctionReturnQuadruples();
@@ -255,12 +256,13 @@ declaration:
                                                         void* variable = createVariable(varType,varName, yylineno,0);
                                                         setVariableAsInitialized(variable);
 
+                                                        checkBothParamsAreNumbers(varType,assignmentType,yylineno);
                                                         checkBothParamsAreOfSameType(varType,assignmentType,yylineno);
                                                         addSymbolToSymbolTable(variable);
                                                         
-                                                        #ifdef DEBUG
-                                                            debugPrintf("Variable: %s = %s\n", varName, assignmentName);
-                                                        #endif
+                                                        
+                                                        debugPrintf("Variable: %s = %s\n", varName, assignmentName);
+                                                        
 
                                                         addQuadrupleToCurrentQuadManager("ASSIGN", assignmentName, "", varName);
                                                 }
@@ -276,10 +278,7 @@ declaration:
                                                         
                                                         setVariableAsInitialized(variable);
                                                         
-                                                        #ifdef DEBUG
-                                                            debugPrintf("Variable: %s = %s\n", varName, assignmentName);
-                                                        #endif
-                                                       
+                                                        debugPrintf("Variable: %s = %s\n", varName, assignmentName);
                                                         
                                                         addQuadrupleToCurrentQuadManager("ASSIGN", assignmentName, "", varName);
                                                   }
@@ -294,7 +293,7 @@ dataType:
     ;
 
 assignment:
-    VARIABLE '=' expression        {
+    VARIABLE '=' expression             {
                                             const char* varName = $1;
                                             const char* valName = $3->name;
                                             void* variable = getSymbolFromSymbolTable(varName,yylineno);
@@ -306,14 +305,10 @@ assignment:
                                             checkVariableIsNotConstant(variable, yylineno);
                                             checkBothParamsAreOfSameType(variableType,assignmentType,yylineno);
                                             
-
-                                            #ifdef DEBUG
-                                                debugPrintf("Assignment\n");
-                                                debugPrintf("Variable: %s = %s\n", varName, valName);
-                                            #endif
+                                            debugPrintf("Assignment\n");
+                                            debugPrintf("Variable: %s = %s\n", varName, valName);
                                             
                                             addQuadrupleToCurrentQuadManager("ASSIGN", valName, "", varName);
-                                            
                                         }
                                        
     ;
@@ -324,7 +319,7 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     void* variable = getVariableFromSymbolTable(val,yylineno);
                                     returnValue->type = getSymbolType(variable);
-                                    returnValue->value = (void*)val;
+                                    
                                     returnValue->name = val;
                                     $$ = returnValue;
                                 }
@@ -334,20 +329,16 @@ expression:
                                     returnValue->type = INTEGER_T;
                                     int* valInt = (int*)malloc(sizeof(int));
                                     *valInt = $1;
-                                    returnValue->value = (void*)valInt;
+                                    
                                     returnValue->name = val;
                                     $$ = returnValue;
-
-                                    #ifdef DEBUG
-                                        debugPrintf("Setting integer with value: %s\n", convertIntNumToChar(*(int*)($$->value)));
-                                    #endif
 
                                 }
     | FLOATING                  {             
                                     const char* val = strdup(convertFloatNumToChar($1));
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     returnValue->type = FLOAT_T;
-                                    returnValue->value = (void*)val;
+                                   
                                     returnValue->name = val;
                                     $$ = returnValue;
 
@@ -356,7 +347,7 @@ expression:
                                     const char* val = strdup(convertIntNumToChar($1));
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     returnValue->type = BOOLEAN_T;
-                                    returnValue->value = (void*)val;
+                                    
                                     returnValue->name = val;
                                     $$ = returnValue;
                                 }
@@ -367,26 +358,24 @@ expression:
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     
                                     returnValue->type = CHAR_T;
-                                    returnValue->value = val;
                                     returnValue->name = val;
                                     $$ = returnValue;
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Setting character with value: %c\n", *(char*)($$->value));
-                                    #endif
+                                    
+
+                                   
                                 }
     | CHARARRAY                 {
                                     const char* val = strdup($1);
                                     ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                     
                                     returnValue->type = STRING_T;
-                                    returnValue->value = (void*)val;
+                                    
                                     returnValue->name = val;
                                     $$ = returnValue;
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Setting string with value: %s\n", (char*)$$->value);
-                                    #endif
+                                    
+                                    
                                 }
     | functionCall              { $$ = $1; }
     | expression '+' expression {
@@ -403,15 +392,14 @@ expression:
                                     addQuadrupleToCurrentQuadManager("ADD", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = castExpressions(expr1,expr2,'+',&returnValue->type,yylineno);
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
-                                    #endif 
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+
+                                     
                                 }
     | expression '-' expression {
                                     ExprValue* expr1 = $1;
@@ -427,15 +415,14 @@ expression:
                                     addQuadrupleToCurrentQuadManager("SUB", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = castExpressions(expr1,expr2,'-',&returnValue->type,yylineno);
+                                    
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
-                                    #endif 
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                 }
     | expression '*' expression {
                                     ExprValue* expr1 = $1;
@@ -451,15 +438,15 @@ expression:
                                     addQuadrupleToCurrentQuadManager("MUL", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = castExpressions(expr1,expr2,'*',&returnValue->type,yylineno);
+                                   
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
-                                    #endif 
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+
+                                    
                                 }
     | expression '/' expression {
                                     ExprValue* expr1 = $1;
@@ -475,15 +462,15 @@ expression:
                                     addQuadrupleToCurrentQuadManager("DIV", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = castExpressions(expr1,expr2,'/',&returnValue->type,yylineno);
+                              
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
-                                    #endif 
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+
+                                     
                                 }
     | expression '^' expression {
                                      ExprValue* expr1 = $1;
@@ -499,15 +486,15 @@ expression:
                                     addQuadrupleToCurrentQuadManager("POW", expr1Name, expr2Name, tempVar);
 
                                     returnValue->type = expr1Type;
-                                    returnValue->value = castExpressions(expr1,expr2,'^',&returnValue->type,yylineno);
+                                  
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
-                                    #endif 
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+
+                                    
                                 }
     | '-' expression             {
                                     const char* tempVar = newTemp();
@@ -519,31 +506,21 @@ expression:
 
                                     returnValue->type = exprType;
                                     
-                                    if (exprType == INTEGER_T) {
-                                        int *val = (int*)malloc(sizeof(int)); 
-                                        *val = -1 * *(int*)$2->value;
-                                        returnValue->value = (void*)val;
-                                    } else {
-                                        float *val = (float*)malloc(sizeof(float));
-                                        *val = -1 * *(float*)$2->value;
-                                        returnValue->value = (void*)val;
-                                    }
 
                                     returnValue->name = tempVar;
                                     addQuadrupleToCurrentQuadManager("NEG", "", exprName, tempVar);
                                     $$ = returnValue;
-
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of expression: %s\n", exprName);
-                                        debugPrintf("Name of result: %s\n", tempVar);
-                                        debugPrintf("Value of result: %s\n", convertNumToChar($$->value,$$->type));
-                                    #endif
+     
+                                    debugPrintf("Name of expression: %s\n", exprName);
+                                    debugPrintf("Name of result: %s\n", tempVar);
+                                   
+                                    
                                  }
     | '(' expression ')'        { $$ = $2; }
     | BOOLEAN_EXPRESSION        { $$ = $1; }
 
 BOOLEAN_EXPRESSION:
-                        expression '||' expression {
+    expression '||' expression {
                                     Type expr1Type = $1->type;
                                     Type expr2Type = $3->type;
                                     const char* tempVar = newTemp();
@@ -554,18 +531,16 @@ BOOLEAN_EXPRESSION:
                                     addQuadrupleToCurrentQuadManager("OR", expr1Name, expr2Name, tempVar);
                                     returnValue->type = BOOLEAN_T;
                                     
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(int*)$1->value || *(int*)$3->value;
-                                    returnValue->value = (void*)val;
+                                    
+                                    
 
                                     returnValue->name = tempVar;
                                     $$ = returnValue;
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,$$->type));
-                                    #endif
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                  }
     | expression '&&' expression {
                                     Type expr1Type = $1->type;
@@ -577,19 +552,14 @@ BOOLEAN_EXPRESSION:
                                     checkBothParamsAreBoolean(expr1Type,expr2Type,yylineno);
                                     addQuadrupleToCurrentQuadManager("AND", expr1Name, expr2Name, tempVar);
 
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(int*)$1->value && *(int*)$3->value;
-                                    returnValue->value = (void*)val;
-
                                     returnValue->type = BOOLEAN_T;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
-                                    #endif
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                  }
     | expression '<' expression  {
                                     Type expr1Type = $1->type;
@@ -601,20 +571,14 @@ BOOLEAN_EXPRESSION:
 
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadrupleToCurrentQuadManager("LT", expr1Name, expr2Name, tempVar);
-
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(float*)$1->value < *(float*)$3->value;
-                                    returnValue->value = (void*)val;
-                                    
+                                                  
                                     returnValue->type = BOOLEAN_T;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
-
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
-                                    #endif
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                  }
     | expression '>' expression {
                                     Type expr1Type = $1->type;
@@ -627,19 +591,13 @@ BOOLEAN_EXPRESSION:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadrupleToCurrentQuadManager("GT", expr1Name, expr2Name, tempVar);
 
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(float*)$1->value > *(float*)$3->value;
-                                    returnValue->value = (void*)val;
-
                                     returnValue->type = BOOLEAN_T;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
-
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
-                                    #endif
+  
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                  }
     | expression GE expression  {
                                     Type expr1Type = $1->type;
@@ -652,19 +610,13 @@ BOOLEAN_EXPRESSION:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadrupleToCurrentQuadManager("GTE", expr1Name, expr2Name, tempVar);
 
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(float*)$1->value >= *(float*)$3->value;
-                                    returnValue->value = (void*)val;
-
                                     returnValue->type = BOOLEAN_T;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
-                                    #endif
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                  }
     | expression LE expression    {
                                     Type expr1Type = $1->type;
@@ -677,19 +629,16 @@ BOOLEAN_EXPRESSION:
                                     checkBothParamsAreNumbers(expr1Type,expr2Type,yylineno);
                                     addQuadrupleToCurrentQuadManager("LTE", expr1Name, expr2Name, tempVar);
                                     
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(float*)$1->value <= *(float*)$3->value;
-                                    returnValue->value = (void*)val;
+                                
 
                                     returnValue->type = BOOLEAN_T;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
-                                    #endif
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                  }
     | expression EQ expression  {
                                     Type expr1Type = $1->type;
@@ -701,20 +650,15 @@ BOOLEAN_EXPRESSION:
 
                                     checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
                                     addQuadrupleToCurrentQuadManager("EQ", expr1Name, expr2Name, tempVar);
-
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(float*)$1->value == *(float*)$3->value;
-                                    returnValue->value = (void*)val;
-                                    
+                                                         
                                     returnValue->type = BOOLEAN_T;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
-                                    #endif
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
+                                    
                                  }
     | expression NE expression  {
                                     Type expr1Type = $1->type;
@@ -726,20 +670,15 @@ BOOLEAN_EXPRESSION:
 
                                     checkBothParamsAreOfSameType(expr1Type,expr2Type,yylineno);
                                     addQuadrupleToCurrentQuadManager("NEQ", expr1Name, expr2Name, tempVar);
-
-                                    int *val = (int*)malloc(sizeof(int));
-                                    *val = *(float*)$1->value != *(float*)$3->value;
-                                    returnValue->value = (void*)val;
+    
 
                                     returnValue->type = BOOLEAN_T;
                                     returnValue->name = tempVar;
                                     $$ = returnValue;  
 
-                                    #ifdef DEBUG
-                                        debugPrintf("Name of first expression: %s\n", expr1Name);
-                                        debugPrintf("Name of second expression: %s\n", expr2Name);
-                                        debugPrintf("Name of result: %s\n", convertNumToChar($$->value,INTEGER_T));
-                                    #endif
+                                    
+                                    debugPrintf("Name of first expression: %s\n", expr1Name);
+                                    debugPrintf("Name of second expression: %s\n", expr2Name);
                                  }
     
     
@@ -754,7 +693,6 @@ functionCall:
                                         ExprValue *returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                         
                                         returnValue->type = getSymbolType(function);
-                                        returnValue->value = (void*)functionName;
                                         returnValue->name = newTemp();
 
                                         handleFunctionCallQuadruples(function,parametersList,returnValue->name);
@@ -863,7 +801,7 @@ caseCondition:
                                         ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                         returnValue->line = yylineno;
                                         returnValue->type = CHAR_T;
-                                        returnValue->value = val;
+                                        ;
                                         returnValue->name = val;
                                         $$ = returnValue;
                                     }
@@ -872,9 +810,6 @@ caseCondition:
                                         ExprValue* returnValue = (ExprValue*)malloc(sizeof(ExprValue));
                                         returnValue->line = yylineno;
                                         returnValue->type = INTEGER_T;
-                                        int* valInt = (int*)malloc(sizeof(int));
-                                        *valInt = $1;
-                                        returnValue->value = (void*)valInt;
                                         returnValue->name = val;
                                         $$ = returnValue;
                                     }
@@ -883,8 +818,11 @@ caseCondition:
 %%
 
 void yyerror(char *s) {
-    fprintf(stderr, "Error: %s at line %d, near '%s'\n", s, yylineno, yytext);
-    printLogToFile(yytext,yylineno,"syntax");
+    static char buffer[1024];
+    sprintf(buffer, "Error: %s at line %d, near '%s'\n", s, yylineno, yytext);
+    fprintf(stderr, "%s", buffer);
+    printExitMsgToFile(buffer);
+    exit(1);
 }
 
 // pass argument in command line
@@ -902,16 +840,17 @@ int main(int argc, char **argv) {
     inputFileName = argv[1];
     yyin = fopen(inputFileName, "r");
     if(yyin == NULL) {
-        debugPrintf("Error: Unable to open file %s\n", argv[1]);
+        debugPrintf("Error: Unable to open input file %s\n", argv[1]);
         return 1;
     }
     
     // Call the parser
+    printf("Compiling input file: %s\n", inputFileName);
     yyparse();
-    printf("Input file: %s\n", inputFileName);
-    printQuadruples(inputFileName);
     printSymbolTable(inputFileName);
-
+    printQuadruples(inputFileName);
+    printUnusedSymbols(inputFileName);
+    
     // Close the input file
     fclose(yyin);
     return 0;
