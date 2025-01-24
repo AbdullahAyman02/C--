@@ -67,7 +67,7 @@ The C-- language is a simplified version of C with some additional features and 
       flag = True;
   } else {
       flag = False;
-  }
+  };
     ```
 - **Switch Statements**:
   ```c
@@ -75,7 +75,7 @@ The C-- language is a simplified version of C with some additional features and 
         case 2: {
             flag = True;
         }
-    }
+    };
     ```
 - **Loops**:
   - **Repeat-Until Loop**:
@@ -89,7 +89,7 @@ The C-- language is a simplified version of C with some additional features and 
     int i;
     for (i = 0; i < i; i = i + 1) {
         flag = False;
-    }
+    };
     ```
   - **While Loop**:
     ```c
@@ -105,11 +105,11 @@ The C-- language is a simplified version of C with some additional features and 
   function int test_function() {
       flag = True;
       return 3;
-  }
+  };
   
   function void void_function(int a, char b, string k) {
       return;
-  }
+  };
   ```
 
 ## Tech Stack
