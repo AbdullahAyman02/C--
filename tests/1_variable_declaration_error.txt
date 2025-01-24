@@ -1,0 +1,4 @@
+Warning: Variable x declared in line 1 is not used
+Warning: Variable x declared in line 1 is not used
+Warning: Variable x declared in line 1 is not used
+Warning: Variable x declared in line 1 is not used

@@ -1,0 +1,14 @@
+Line 3 Semantic Error: Symbol x already exists in line 1
+
+Line 3 Semantic Error: Symbol x already exists in line 1
+
+Line 3 Semantic Error: Symbol x already exists in line 1
+
+Line 2 Semantic Error: Symbol x already exists in line 1
+
+Warning: Variable x declared in line 1 is not used
+Warning: Variable xy declared in line 3 is not used
+Line 3 Semantic Error: Variable x is not initialized
+
+Line 3 Semantic Error: Parameters are not of the same type Type mismatch: First parameter is of type float ,Second parameter is of type integer
+

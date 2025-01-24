@@ -1,0 +1,6 @@
+int x = 6;
+
+float xy = x;
+
+
+

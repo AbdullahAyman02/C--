@@ -1,0 +1,2 @@
+Warning: Variable flag4 declared in line 6 is not used
+Warning: Variable flag4 declared in line 6 is not used

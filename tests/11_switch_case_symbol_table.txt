@@ -1,0 +1,28 @@
+------ Symbol Table 0 ------
+----------------------------------
+| Name  | Kind |  Type   | Other |
+----------------------------------
+| flag3 | Var  | boolean |  -    |
+| z     | Var  | integer |  -    |
+| flag2 | Var  | boolean |  -    |
+| flag1 | Var  | boolean |  -    |
+| flag4 | Var  | boolean |  -    |
+| w     | Var  | integer |  -    |
+----------------------------------
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 1 ------
+Empty
+
+------ Child of Symbol Table 0 ------
+------ Symbol Table 2 ------
+Empty
+
+------ Child of Symbol Table 2 ------
+------ Symbol Table 3 ------
+Empty
+
+------ Child of Symbol Table 2 ------
+------ Symbol Table 4 ------
+Empty
+

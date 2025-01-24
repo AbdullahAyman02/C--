@@ -1,8 +1,0 @@
-Line 1 Semantic Error: Symbol true not found
-
-Warning: Variable w declared in line 7 is not used
-Warning: Variable expected declared in line 1 is not used
-Warning: Variable ok declared in line 6 is not used
-Error: syntax error at line 8, near 'ok1'
-
-Warning: Variable ok1 declared in line 8 is not used

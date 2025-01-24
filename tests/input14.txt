@@ -1,6 +1,0 @@
-int x = 5;
-bool flag = False;
-
-while (flag == False) {
-    x = 7;
-};

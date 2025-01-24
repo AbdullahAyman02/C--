@@ -1,0 +1,12 @@
+Warning: Variable x declared in line 1 is not used
+Warning: Variable y declared in line 2 is not used
+Warning: Variable x declared in line 1 is not used
+Warning: Variable y declared in line 2 is not used
+Error: syntax error at line 4, near 'abc'
+
+Error: syntax error at line 4, near 'abc'
+
+Error: syntax error at line 4, near 'abc'
+
+Error: syntax error at line 4, near ')'
+

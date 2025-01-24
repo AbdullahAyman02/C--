@@ -1,0 +1,14 @@
+Line 13 Semantic Error: Variable x is not initialized
+
+Warning: Variable x declared in line 2 is not used
+Warning: Variable x declared in line 5 is not used
+Warning: Variable y declared in line 8 is not used
+Warning: Variable z declared in line 10 is not used
+Warning: Variable x declared in line 2 is not used
+Warning: Variable x declared in line 5 is not used
+Warning: Variable y declared in line 8 is not used
+Warning: Variable z declared in line 10 is not used
+Warning: Variable x declared in line 2 is not used
+Warning: Variable x declared in line 5 is not used
+Warning: Variable y declared in line 8 is not used
+Warning: Variable z declared in line 10 is not used

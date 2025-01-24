@@ -1,7 +1,0 @@
-Line 2 Semantic Error: Symbol x already exists in line 1
-
-Error: syntax error at line 10, near 'int'
-
-Warning: Function main declared in line 1 is not used
-Warning: Function main2 declared in line 6 is not used
-Warning: Variable xx declared in line 10 is not used

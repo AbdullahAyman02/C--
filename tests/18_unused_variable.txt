@@ -1,0 +1,6 @@
+int x;
+int y = 5;
+
+function void abc (){
+
+}

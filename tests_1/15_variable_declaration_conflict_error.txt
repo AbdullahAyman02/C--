@@ -1,4 +1,0 @@
-Line 3 Semantic Error: Symbol x already exists in line 1
-
-Line 3 Semantic Error: Symbol x already exists in line 1
-
