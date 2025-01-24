@@ -162,7 +162,7 @@ fibonacci(10);
 ```
 
 **The output:**
-```bash
+```
 Compiling input file: .\13_functions.txt
 ------ Symbol Table 0 ------
 ---------------------------------------------
