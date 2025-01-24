@@ -115,7 +115,7 @@ The C-- language is a simplified version of C with some additional features and 
 ## Tech Stack
 This project was developed using the **Flex** and **Bison** tools. In addition **C++** was used to implement the logic of the compiler.
 
-Where flex is used to take the input token pattern and generate the necessary code to recognize these patterns, and bison is used to generate the parser for the grammar of the language.
+Where flex is used to take the input token patterns and generate the necessary code to recognize these patterns, and bison is used to generate the parser for the grammar of the language.
 
 ## How to Build and Run
 The following dependencies are required to build and run the project:
